@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 class Venta(models.Model):
     fecha_venta = models.DateField(auto_now_add=True)
-    total_venta = models.DecimalField(max_digits=12, decimal_places=2)
+    total_venta = models.DecimalField(max_digits=12, decimal_places=3)
     
     def __str__(self):
         return f"Venta: {self.fecha_venta}, {self.total_venta}"
@@ -11,7 +11,7 @@ class Venta(models.Model):
 class DetalleVenta(models.Model):
     id_producto = models.IntegerField()
     cantidad = models.IntegerField()
-    subtotal = models.DecimalField(max_digits=12, decimal_places=2)
+    subtotal = models.DecimalField(max_digits=12, decimal_places=3)
     
     venta = models.ForeignKey(
         Venta,

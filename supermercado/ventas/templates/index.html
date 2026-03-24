@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas</title>
+</head>
+
+<style>
+    * {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        border: 1px solid #d6cbcb;
+        border-radius: 8px;
+        border-color: #968d8d;
+        background-color: white;
+        width: 300px;
+        padding: 15px 15px;
+    }
+
+    .venta {
+        border: 1px solid #0a46be;
+        border-radius: 8px;
+        background-color: #b7bedf;
+        margin: 20px;
+        padding: 20px;
+        border-left: 6px solid #0a2fa8;
+    }
+
+    .detalle {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #d4d4d4;
+        border-radius: 8px;
+        background-color: #f4f5f7;
+        gap: 8px;
+        margin: 15px 20px;
+        padding: 15px;
+    }
+
+    h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        color: #1f2d5a;
+    }
+
+    h4 {
+        font-size: 16px;
+    }
+
+    p {
+        font-size: 14px;
+        line-height: 1.4;
+        color: #333;
+    }
+
+    .valor {
+        font-weight: bold;
+    }
+</style>
+
+<body>
+    <div class="container">
+
+        <h3>Venta:</h3>
+
+        <div class="venta">
+            {% if existe %}
+            <p>Total: <span class="valor">${{venta.total_venta}}</span></p>
+            <p>Fecha: <span class="valor">{{venta.fecha_venta}}</span></p>
+            {% else %}
+            <h4>Ups al parecer la venta no existe</h4>
+            {% endif %}
+        </div>
+
+        <br>
+
+        <h3>Detalles de la venta:</h3>
+
+        {% for detalle in detalle_venta %}
+        <div class="detalle">
+            <p>Producto: <span class="valor">Comida</span></p>
+            <p>Subtotal: <span class="valor">${{detalle.subtotal}}</span></p>
+            <p>Cantidad: <span class="valor">{{detalle.cantidad}}</span></p>
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+
+</html>
