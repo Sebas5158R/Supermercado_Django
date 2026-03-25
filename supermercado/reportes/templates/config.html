@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración Reporte</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background-color: #0f172a;
+      color: rgb(18, 11, 79);
+      height: 100vh;
+      display: flex;
+    }
+    .barra {
+      width: 220px;
+      height: 100vh;
+      background: #020617;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .barra h2 {
+      color: #38bdf8;
+      margin-bottom: 20px;
+    }
+    .item-menu {
+      margin: 10px 0;
+      padding: 8px;
+      color: #D3DCED;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    .item-menu:hover {
+      background: #1e293b;
+    }
+    .contenedorP {
+      flex: 1;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+      margin-bottom: 20px;
+    }
+    .cuadro {
+      display: grid;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    .card {
+      background: #D3DCED;
+      padding: 20px;
+      border-radius: 6px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .label {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+    .value {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 5px;
+      color: #020617;
+    }
+    .descripcion {
+      font-size: 14px;
+      margin-top: 10px;
+      color: #161417;
+    }
+  </style>
+
+</head>
+<body>
+  <div class="barra">
+    <h2>Reportes</h2>
+    <div class="item-menu">Dashboard</div>
+    <div class="item-menu">Financieros</div>
+    <div class="item-menu">Operativos</div>
+    <div class="item-menu">RRHH</div>
+    <div class="item-menu">Configuración</div>
+  </div>
+
+  <div class="contenedorP">
+    <h1>Configuración del Reporte</h1>
+
+    <div class="cuadro">
+
+      {% if reportes %}
+
+        {% for r in reportes %}
+          {% if r.id_reporte|stringformat:"s" == id_actual %}
+            <div class="card">
+              <div class="label">Nombre</div>
+              <div class="value">{{ r.nombre }}</div>
+            </div>
+            <div class="card">
+              <div class="label">Tipo</div>
+              <div class="value">{{ r.tipo }}</div>
+            </div>
+            <div class="card">
+              <div class="label">Monto</div>
+              <div class="value monto">$ {{ r.total_monto }}</div>
+            </div>
+            <div class="card">
+              <div class="label">Estado</div>
+              <div class="value {% if r.activo_tf %}activo{% else %}inactivo{% endif %}">
+                {% if r.activo_tf %} Activo {% else %} Inactivo {% endif %}
+              </div>
+            </div>
+            <div class="card">
+              <div class="label">Fecha</div>
+              <div class="value">{{ r.fecha_creacion }}</div>
+            </div>
+            <div class="card">
+              <div class="label">Usuario</div>
+              <div class="value">{{ r.usuario_creacion }}</div>
+            </div>
+            </div>
+            <div class="card" style="margin-top:20px;">
+              <div class="label">Descripción</div>
+              <div class="descripcion">
+                {{ r.descripcion|default:"Sin descripción" }}
+              </div>
+            </div>
+
+          {% endif %}
+        {% endfor %}
+
+      {% else %}
+          <h4>No hay reportes disponibles</h4>
+      {% endif %}
+
+    </div>
+  </div>
+</body>
+</html>
