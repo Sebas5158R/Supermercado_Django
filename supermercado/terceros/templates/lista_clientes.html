@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block lista-clientes %}
+
+    {% include "header_clientes.html" with nombreQuienLlama=cliente_actual.nombre numeroVistas=5 %}
+    <h1>Bienvenido {{ cliente_actual.nombre }}</h1>
+    <h2>Lista de Clientes registrados en el sistema</h2>
+    <table>
+        <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Acciones</th>
+        </tr>
+        {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ cliente.email }}</td>
+                <td>
+                    <button>Editar</button>
+                    <button>Eliminar</button>
+                </td>
+                <td>
+                    <a href="{% url 'terceros:saludo_cliente' cliente_id=cliente.id %}">Ir a saludo cliente</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <button>Agregar Cliente</button>
+{% endblock %}
+
+<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem, suscipit? Error nobis laborum perspiciatis, aspernatur ullam voluptas corporis sapiente incidunt, voluptatem odio maiores cum autem iusto iure ipsa possimus rem architecto quo mollitia molestiae nulla ex. Temporibus expedita totam dolores dolorem autem nihil quaerat optio voluptas voluptate sint quae provident iusto velit sequi, aspernatur, nemo delectus deleniti ullam laborum dolor itaque vero. Voluptate ea rerum magnam animi laudantium non, consequatur iure saepe molestias explicabo natus ipsam facere doloremque minus reprehenderit qui illo eveniet ratione modi et aliquam laborum quos autem odio? Veritatis, molestiae incidunt? Suscipit excepturi cupiditate maiores saepe. Inventore eius architecto ipsum totam magnam. Quod magnam odio officiis amet laudantium eligendi cum fuga error ea nam sapiente, harum exercitationem itaque cupiditate sequi asperiores doloremque quisquam saepe unde, libero est necessitatibus? Doloribus itaque praesentium magni, dolorum magnam earum non enim labore perferendis? Consequatur temporibus exercitationem et laborum fuga molestias excepturi aliquid magni unde vero itaque vitae commodi nobis, repudiandae necessitatibus veritatis voluptatem architecto neque adipisci nostrum esse earum nisi. Sequi vel eaque possimus. Eum repudiandae, suscipit corrupti sint perspiciatis perferendis dicta unde nostrum sed corporis veniam, aliquam tenetur aspernatur voluptatum ab ratione. Dolores, asperiores. Ex dolorum fugiat optio aut beatae.</p>
+
+
+{% block footer %}
+    {% include "footer_clientes.html" %}
+{% endblock %}
