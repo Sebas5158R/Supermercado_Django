@@ -1,89 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de Reportes</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background-color: #0f172a;
-      color: rgb(18, 11, 79);
-      height: 100vh;
-      display: flex;
-    }
-    .barra {
-      width: 220px;
-      height: 100vh;
-      background: #020617;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-    .barra h2 {
-      color: #38bdf8;
-      margin-bottom: 20px;
-    }
-    .item-menu {
-      margin: 10px 0;
-      padding: 8px;
-      color: #D3DCED;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .item-menu:hover {
-      background: #1e293b;
-    }
-    .contenedorP {
-      flex: 1;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #38bdf8;
-      margin-bottom: 20px;
-    }
-    table {
-      width: 100%;
-      background: #D3DCED;
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    thead {
-      background: #1e293b;
-      color: #38bdf8;
-    }
+{% extends "layout.html" %}
 
-    tr:hover {
-      background: #cbd5f5;
-    }
-    .acciones button {
-      background: #1e293b;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      margin-right: 5px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-    .acciones button:hover {
-      background: #334155;
-    }
-
-  </style>
-</head>
-<body>
-  <div class="barra">
-    <h2>Reportes</h2>
-    <div class="item-menu">Dashboard</div>
-    <div class="item-menu">Financieros</div>
-    <div class="item-menu">Operativos</div>
-    <div class="item-menu">RRHH</div>
-    <div class="item-menu">Configuración</div>
-  </div>
-
-  <div class="contenedorP">
+{% block contenido %}
+<div class="contenedorP">
     <h1>Listado de Reportes</h1>
     {% if existe %}
       <table>
@@ -125,5 +43,4 @@
         <h3>No hay reportes registrados</h3>
     {% endif %}
   </div>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,29 @@
+    body {
+      margin: 0;
+      font-family: Arial;
+      background-color: #0f172a;
+      color: rgb(18, 11, 79);
+      height: 100vh;
+      display: flex;
+    }
+    .barra {
+      width: 220px;
+      height: 100vh;
+      background: #020617;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .barra h2 {
+      color: #38bdf8;
+      margin-bottom: 20px;
+    }
+    .item-menu {
+      margin: 10px 0;
+      padding: 8px;
+      color: #D3DCED;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-menu:hover {
+      background: #1e293b;
+    }
