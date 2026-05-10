@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from . import models
+from . import forms
 
 # Create your views here.
 def clientes(request, nombre, activo, fecha_registro):
@@ -22,3 +23,45 @@ def lista_clientes(request, cliente_id):
     cliente_actual = models.Cliente.objects.get(id=cliente_id)
     clientes = models.Cliente.objects.all()
     return render(request, "lista_clientes.html", {"clientes": clientes, "cliente_actual": cliente_actual})
+
+def template_formulario(request):
+    if request.method == "GET":
+        return render(request, "formulario.html", { "formulario": forms.FormularioTercero })
+    
+def guardar_cliente(request):
+    # if request.method == "POST":
+    #     id = request.POST["identificador"]
+    #     nombre = request.POST["nombre"]
+    #     email = request.POST["email"]
+    #     telefono = request.POST["telefono"]
+    #     activo = request.POST["activo"]
+        
+    #     nuevo_cliente = models.Cliente.objects.create(
+    #         id = id,
+    #         nombre = nombre,
+    #         email = email,
+    #         telefono = telefono,
+    #         activo = True
+    #     )
+        
+    #     return redirect("terceros:lista_clientes/1")
+    
+    id = request.POST["identificador"]
+    nombre = request.POST["nombre"]
+    email = request.POST["email"]
+    telefono = request.POST["telefono"]
+    
+    try:
+        nuevo_cliente = models.Cliente.objects.create(
+            id = id,
+            nombre = nombre,
+            email = email,
+            telefono = telefono,
+            activo = True
+            )
+    except:
+        print("Error")
+        
+        
+    return redirect("terceros:lista_clientes/1")
+        
