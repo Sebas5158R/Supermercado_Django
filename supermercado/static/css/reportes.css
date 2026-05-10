@@ -1,0 +1,29 @@
+    .item-menu.menu-activo {
+      background: #1e293b;
+      color: #38bdf8;
+      font-weight: bold;
+      border-left: 3px solid #38bdf8;
+    }
+    .estado-activo {
+      color: #34d399;
+      font-weight: bold;
+    }
+    .estado-inactivo {
+      color: #fca5a5;
+    }
+    .monto {
+      color: #38bdf8;
+      font-weight: bold;
+    }
+    td, th {
+      text-align: left;
+      vertical-align: middle;
+    }
+    th {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    a {
+      color: inherit;
+    }

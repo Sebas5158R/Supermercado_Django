@@ -1,8 +1,11 @@
+{% load static %}
 <div class="barra">
     <h2>Supermercado Lolitas</h2>
-    <div class="item-menu">Inventarios</div>
-    <div class="item-menu">Productos</div>
-    <div class="item-menu">Terceros</div>
-    <div class="item-menu">Ventas</div>
-    <div class="item-menu">Reportes</div>
+    <div class="item-menu">Gestión de Productos</div>
+    <div class="item-menu">Gestión de Clientes/Ventas</div>
+    <div class="item-menu">Gestión de Terceros</div>
+    <div class="item-menu">Gestión de Inventarios</div>
+    <a href="{% url 'reportes:list' %}" style="text-decoration:none;">
+        <div class="item-menu {% block menu_reportes %}{% endblock %}">Gestión de Reportes</div>
+    </a>
 </div>

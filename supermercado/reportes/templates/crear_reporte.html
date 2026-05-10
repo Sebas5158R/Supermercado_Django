@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+
+{% block menu_reportes %}menu-activo{% endblock %}
+
+{% block contenido %}
+<div class="contenedorP">
+
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+        <a href="{% url 'reportes:list' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver al listado</a>
+    </div>
+
+    <h1>{{ accion }} Reporte</h1>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div style="background:#7f1d1d; color:#fca5a5; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div style="max-width:640px; margin:0 auto;">
+        <form method="post">
+            {% csrf_token %}
+
+            <div style="display:flex; flex-direction:column; gap:18px;">
+
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.nombre.label }}</label>
+                    {{ form.nombre }}
+                    {% if form.nombre.errors %}
+                    <span style="color:#fca5a5; font-size:12px;">{{ form.nombre.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.tipo.label }}</label>
+                    {{ form.tipo }}
+                    <p style="font-size:12px; color:#64748b; margin-top:4px;">El monto total se calculará automáticamente según el tipo seleccionado.</p>
+                    {% if form.tipo.errors %}
+                    <span style="color:#fca5a5; font-size:12px;">{{ form.tipo.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div>
+                        <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.fecha_desde.label }}</label>
+                        {{ form.fecha_desde }}
+                    </div>
+                    <div>
+                        <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.fecha_hasta.label }}</label>
+                        {{ form.fecha_hasta }}
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
+                    {% if form.descripcion.errors %}
+                    <span style="color:#fca5a5; font-size:12px;">{{ form.descripcion.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.usuario_creacion.label }}</label>
+                    {{ form.usuario_creacion }}
+                    {% if form.usuario_creacion.errors %}
+                    <span style="color:#fca5a5; font-size:12px;">{{ form.usuario_creacion.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div style="display:flex; align-items:center; gap:10px;">
+                    {{ form.activo_tf }}
+                    <label style="color:#94a3b8; font-size:13px;">{{ form.activo_tf.label }}</label>
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top:8px;">
+                    <button type="submit" style="background:#38bdf8; color:#0f172a; border:none; padding:12px 28px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">
+                        {{ accion }} Reporte
+                    </button>
+                    <a href="{% url 'reportes:list' %}">
+                        <button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer; font-size:15px;">
+                            Cancelar
+                        </button>
+                    </a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<style>
+    .form-input {
+        width: 100%;
+        padding: 10px 14px;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        color: #D3DCED;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #38bdf8;
+    }
+    .form-select {
+        width: 100%;
+        padding: 10px 14px;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        color: #D3DCED;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    .form-select:focus {
+        outline: none;
+        border-color: #38bdf8;
+    }
+    .form-checkbox {
+        width: 18px;
+        height: 18px;
+        accent-color: #38bdf8;
+    }
+</style>
+{% endblock %}
