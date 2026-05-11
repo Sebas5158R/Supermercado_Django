@@ -20,7 +20,7 @@ TIPOS_REPORTE = {
 }
 
 
-def list(request):
+def listar(request):
     buscar = request.GET.get('buscar', '')
     tipo_filtro = request.GET.get('tipo', '')
     estado_filtro = request.GET.get('estado', '')
@@ -86,7 +86,7 @@ def crear(request):
             reporte.total_monto = total
             reporte.save()
             messages.success(request, f'Reporte "{reporte.nombre}" creado exitosamente.')
-            return redirect('reportes:list')
+            return redirect('reportes:listar')
     else:
         form = ReporteForm()
 
@@ -105,7 +105,7 @@ def editar(request, id_reporte):
         if form.is_valid():
             form.save()
             messages.success(request, f'Reporte "{reporte.nombre}" actualizado.')
-            return redirect('reportes:list')
+            return redirect('reportes:listar')
     else:
         form = ReporteForm(instance=reporte)
 
@@ -124,25 +124,74 @@ def eliminar(request, id_reporte):
         nombre = reporte.nombre
         reporte.delete()
         messages.success(request, f'Reporte "{nombre}" eliminado.')
-        return redirect('reportes:list')
+        return redirect('reportes:listar')
     return render(request, 'confirmar_eliminar.html', {'reporte': reporte})
 
 
 def config(request, id_reporte):
     reporte = get_object_or_404(models.Reporte, id_reporte=id_reporte)
-    categorias = reporte.categorias.all()
+
+    if request.method == 'POST':
+        ids_seleccionados = request.POST.getlist('categorias')
+        reporte.categorias.set(
+            models.CategoriaReporte.objects.filter(id__in=ids_seleccionados)
+        )
+        messages.success(request, 'Categorías actualizadas correctamente.')
+        return redirect('reportes:config', id_reporte=id_reporte)
+
+    todas_categorias = models.CategoriaReporte.objects.all().order_by('nombre')
+    ids_asignados = reporte.categorias.values_list('id', flat=True)
+
     data = {
         'reporte': reporte,
-        'categorias': categorias,
+        'todas_categorias': todas_categorias,
+        'ids_asignados': ids_asignados,
         'tipos': TIPOS_REPORTE,
     }
     return render(request, 'config.html', data)
 
 
+def categorias(request):
+    todas = models.CategoriaReporte.objects.all().order_by('nombre')
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        if nombre:
+            if models.CategoriaReporte.objects.filter(nombre__iexact=nombre).exists():
+                messages.error(request, f'Ya existe una categoría con el nombre "{nombre}".')
+            else:
+                models.CategoriaReporte.objects.create(nombre=nombre, descripcion=descripcion or None)
+                messages.success(request, f'Categoría "{nombre}" creada exitosamente.')
+                return redirect('reportes:categorias')
+        else:
+            messages.error(request, 'El nombre de la categoría es obligatorio.')
+
+    data = {
+        'todas': todas,
+        'tipos': TIPOS_REPORTE,
+    }
+    return render(request, 'categorias.html', data)
+
+
+def eliminar_categoria(request, categoria_id):
+    categoria = get_object_or_404(models.CategoriaReporte, id=categoria_id)
+    if request.method == 'POST':
+        nombre = categoria.nombre
+        categoria.delete()
+        messages.success(request, f'Categoría "{nombre}" eliminada.')
+        return redirect('reportes:categorias')
+    data = {
+        'categoria': categoria,
+        'tipos': TIPOS_REPORTE,
+    }
+    return render(request, 'confirmar_eliminar_categoria.html', data)
+
+
 def reportes(request, tipo):
     if tipo not in TIPOS_REPORTE:
         messages.error(request, 'Tipo de reporte no válido.')
-        return redirect('reportes:list')
+        return redirect('reportes:listar')
 
     fecha_desde = request.GET.get('fecha_desde', '')
     fecha_hasta = request.GET.get('fecha_hasta', '')
@@ -173,7 +222,7 @@ def reportes(request, tipo):
             'total_ventas': total_ventas,
             'promedio_venta': promedio,
             'total_registros': qs.count(),
-            'ventas_por_fecha': list(por_fecha),
+            'ventas_por_fecha': por_fecha,
         })
 
     elif tipo == 'productos':
@@ -196,7 +245,6 @@ def reportes(request, tipo):
         total_entradas = qs.aggregate(e=Sum('cantidad_entradas'))['e'] or 0
         total_salidas = qs.aggregate(s=Sum('cantidad_salidas'))['s'] or 0
         stock_total = qs.aggregate(st=Sum('stock_actual'))['st'] or 0
-        criticos = qs.filter(stock_actual__lte=models.models.F('stock_minimo') if hasattr(models, 'models') else 5)
         contexto.update({
             'inventarios': qs[:50],
             'total_entradas': total_entradas,
@@ -219,7 +267,7 @@ def reportes(request, tipo):
             'activos': activos,
             'inactivos': inactivos,
             'total_proveedores': qs.count(),
-            'por_ciudad': list(por_ciudad),
+            'por_ciudad': por_ciudad,
         })
 
     return render(request, 'reportes.html', contexto)
