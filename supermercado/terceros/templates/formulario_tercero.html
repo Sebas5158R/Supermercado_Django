@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+
+{% block contenido %}
+
+<div class="contenedorP">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+        <a href="{% url 'terceros:lista_terceros' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">←
+            Volver al
+            listado</a>
+    </div>
+
+    <h1>{{ accion }} Tercero</h1>
+
+    <div style="max-width:640px; margin:0 auto;">
+
+        {% if form.errors %}
+        <div style="color:red;">
+            {{ form.errors }}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div style="display:flex; flex-direction:column; gap:18px;">
+
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.nombre.label }}</label>
+                    {{ form.nombre }}
+                    {% if form.nombre.errors %}
+                    <span style="color:#fca5a5; font-size:12px;">{{ form.nombre.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.email.label }}</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <span style="color:#fca5a5; font-size:12px;">{{ form.email.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.telefono.label }}</label>
+                    {{ form.telefono }}
+                    {% if form.telefono.errors %}
+                    <span style="color:#fca5a5; font-size:12px;">{{ form.telefono.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                {% if form.direccion %}
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.direccion.label }}</label>
+                    {{ form.direccion }}
+                    {% if form.direccion.errors %}
+                    <span style="color:#fca5a5; font-size:12px;">{{ form.direccion.errors.0 }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if form.ciudad %}
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.ciudad.label }}</label>
+                    {{ form.ciudad }}
+                    {% if form.ciudad.errors %}
+                    <span style="color:#fca5a5; font-size:12px;">{{ form.ciudad.errors.0 }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if form.estado %}
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.estado.label }}</label>
+                    {{ form.estado }}
+                    {% if form.estado.errors %}
+                    <span style="color:#fca5a5; font-size:12px;">{{ form.estado.errors.0 }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.activo.label }}</label>
+                    {{ form.activo }}
+                </div>
+
+                <button type="submit"
+                    style="background:#38bdf8; color:#0f172a; border:none; padding:10px 18px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:14px;">
+                    Guardar Tercero
+                </button>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

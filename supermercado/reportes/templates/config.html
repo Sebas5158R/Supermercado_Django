@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+
+{% block menu_reportes %}menu-activo{% endblock %}
+
+{% block contenido %}
+<div class="contenedorP">
+
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+        <a href="{% url 'reportes:list' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver al listado</a>
+    </div>
+
+    <h1>Configuración del Reporte</h1>
+
+    <div style="display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-top:10px;">
+
+        <div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+
+                <div style="background:#1e293b; padding:20px; border-radius:8px;">
+                    <div style="color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">Nombre</div>
+                    <div style="color:#D3DCED; font-size:17px; font-weight:bold; margin-top:6px;">{{ reporte.nombre }}</div>
+                </div>
+
+                <div style="background:#1e293b; padding:20px; border-radius:8px;">
+                    <div style="color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">Tipo</div>
+                    <div style="margin-top:6px;">
+                        <span style="background:#0c4a6e; color:#38bdf8; padding:4px 10px; border-radius:4px; font-size:14px; font-weight:bold;">
+                            {% for key, label in tipos.items %}{% if key == reporte.tipo %}{{ label }}{% endif %}{% endfor %}
+                        </span>
+                    </div>
+                </div>
+
+                <div style="background:#1e293b; padding:20px; border-radius:8px;">
+                    <div style="color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">Monto Total</div>
+                    <div style="color:#38bdf8; font-size:22px; font-weight:bold; margin-top:6px;">${{ reporte.total_monto|floatformat:2 }}</div>
+                </div>
+
+                <div style="background:#1e293b; padding:20px; border-radius:8px;">
+                    <div style="color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">Estado</div>
+                    <div style="margin-top:6px;">
+                        {% if reporte.activo_tf %}
+                        <span style="background:#064e3b; color:#34d399; padding:4px 10px; border-radius:4px; font-size:14px; font-weight:bold;">Activo</span>
+                        {% else %}
+                        <span style="background:#7f1d1d; color:#fca5a5; padding:4px 10px; border-radius:4px; font-size:14px; font-weight:bold;">Inactivo</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="background:#1e293b; padding:20px; border-radius:8px;">
+                    <div style="color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">Fecha de Creación</div>
+                    <div style="color:#D3DCED; font-size:16px; font-weight:500; margin-top:6px;">{{ reporte.fecha_creacion|date:"d/m/Y" }}</div>
+                </div>
+
+                <div style="background:#1e293b; padding:20px; border-radius:8px;">
+                    <div style="color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">Usuario</div>
+                    <div style="color:#D3DCED; font-size:16px; font-weight:500; margin-top:6px;">{{ reporte.usuario_creacion }}</div>
+                </div>
+
+            </div>
+
+            {% if reporte.descripcion %}
+            <div style="background:#1e293b; padding:20px; border-radius:8px; margin-top:14px;">
+                <div style="color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Descripción</div>
+                <div style="color:#D3DCED; font-size:14px; line-height:1.6;">{{ reporte.descripcion }}</div>
+            </div>
+            {% endif %}
+
+            {% if reporte.parametros %}
+            <div style="background:#1e293b; padding:20px; border-radius:8px; margin-top:14px;">
+                <div style="color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">Parámetros del Reporte</div>
+                <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                    {% if reporte.parametros.fecha_desde %}
+                    <div>
+                        <span style="color:#64748b; font-size:12px;">Desde:</span>
+                        <span style="color:#D3DCED; margin-left:6px; font-size:14px;">{{ reporte.parametros.fecha_desde }}</span>
+                    </div>
+                    {% endif %}
+                    {% if reporte.parametros.fecha_hasta %}
+                    <div>
+                        <span style="color:#64748b; font-size:12px;">Hasta:</span>
+                        <span style="color:#D3DCED; margin-left:6px; font-size:14px;">{{ reporte.parametros.fecha_hasta }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div style="background:#1e293b; padding:16px 20px; border-radius:8px; margin-top:14px;">
+                <div style="color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">ID del Reporte</div>
+                <div style="color:#64748b; font-size:12px; font-family:monospace; word-break:break-all;">{{ reporte.id_reporte }}</div>
+            </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:12px;">
+
+            <div style="background:#1e293b; padding:20px; border-radius:8px;">
+                <div style="color:#94a3b8; font-size:13px; margin-bottom:14px; font-weight:bold;">Acciones</div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <a href="{% url 'reportes:ver' reporte.tipo %}" style="text-decoration:none;">
+                        <button style="width:100%; background:#38bdf8; color:#0f172a; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:14px;">
+                            Ver Datos del Reporte
+                        </button>
+                    </a>
+                    <a href="{% url 'reportes:editar' reporte.id_reporte %}" style="text-decoration:none;">
+                        <button style="width:100%; background:#0369a1; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; font-size:14px;">
+                            Editar Reporte
+                        </button>
+                    </a>
+                    <a href="{% url 'reportes:eliminar' reporte.id_reporte %}" style="text-decoration:none;">
+                        <button style="width:100%; background:#991b1b; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; font-size:14px;">
+                            Eliminar Reporte
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+            {% if categorias %}
+            <div style="background:#1e293b; padding:20px; border-radius:8px;">
+                <div style="color:#94a3b8; font-size:13px; margin-bottom:12px; font-weight:bold;">Categorías</div>
+                {% for cat in categorias %}
+                <div style="background:#0f172a; padding:8px 12px; border-radius:6px; color:#D3DCED; font-size:13px; margin-bottom:8px;">
+                    {{ cat.nombre }}
+                    {% if cat.descripcion %}
+                    <div style="color:#64748b; font-size:12px; margin-top:2px;">{{ cat.descripcion }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="background:#1e293b; padding:20px; border-radius:8px;">
+                <div style="color:#94a3b8; font-size:13px; margin-bottom:8px; font-weight:bold;">Categorías</div>
+                <div style="color:#64748b; font-size:13px;">Sin categorías asignadas</div>
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

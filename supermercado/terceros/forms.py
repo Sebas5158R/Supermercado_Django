@@ -1,9 +1,16 @@
 from django import forms
 
-class FormularioTercero(forms.Form):
-    identificador = forms.IntegerField(label="Id")
+class FormularioCliente(forms.Form):
     nombre = forms.CharField(label="Nombre", max_length=100)
     email = forms.EmailField(label="Email", max_length=100)
     telefono = forms.IntegerField(label="Telefono")
     activo = forms.BooleanField(label="Activo")
-    # fecha_nacimiento = forms.DateField(label="Fecha de nacimiento", widget=forms.DateInput(attrs={"type":"date"}))
+
+class FormularioProveedor(forms.Form):
+    nombre = forms.CharField(label="Nombre", max_length=100)
+    email = forms.EmailField(label="Email", max_length=100)
+    telefono = forms.IntegerField(label="Telefono")
+    direccion = forms.CharField(label="Direccion", max_length=200)
+    ciudad = forms.CharField(label="Ciudad", max_length=50)
+    estado = forms.CharField(label="Estado", max_length=50)
+    activo = forms.BooleanField(label="Activo")
