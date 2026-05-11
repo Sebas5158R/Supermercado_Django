@@ -6,7 +6,7 @@
 <div class="contenedorP">
 
     <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
-        <a href="{% url 'reportes:list' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver al listado</a>
+        <a href="{% url 'reportes:listar' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver al listado</a>
     </div>
 
     <h1>{{ accion }} Reporte</h1>
@@ -78,7 +78,7 @@
                     <button type="submit" style="background:#38bdf8; color:#0f172a; border:none; padding:12px 28px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">
                         {{ accion }} Reporte
                     </button>
-                    <a href="{% url 'reportes:list' %}">
+                    <a href="{% url 'reportes:listar' %}">
                         <button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer; font-size:15px;">
                             Cancelar
                         </button>

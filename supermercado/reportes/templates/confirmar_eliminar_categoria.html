@@ -6,10 +6,10 @@
 <div class="contenedorP">
 
     <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
-        <a href="{% url 'reportes:listar' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver al listado</a>
+        <a href="{% url 'reportes:categorias' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver a categorías</a>
     </div>
 
-    <h1>Eliminar Reporte</h1>
+    <h1>Eliminar Categoría</h1>
 
     <div style="max-width:520px; margin:30px auto; background:#1e293b; border-radius:10px; padding:32px; text-align:center; border:1px solid #7f1d1d;">
 
@@ -18,24 +18,22 @@
         <h2 style="color:#fca5a5; margin-bottom:12px; font-size:20px;">¿Confirmar eliminación?</h2>
 
         <p style="color:#94a3b8; font-size:14px; line-height:1.6; margin-bottom:20px;">
-            Estás a punto de eliminar el reporte
-            <strong style="color:#D3DCED;">"{{ reporte.nombre }}"</strong>.
-            Esta acción no se puede deshacer.
+            Estás a punto de eliminar la categoría
+            <strong style="color:#D3DCED;">"{{ categoria.nombre }}"</strong>.
+            Se desasignará de todos los reportes que la tengan. Esta acción no se puede deshacer.
         </p>
 
         <div style="background:#0f172a; border-radius:6px; padding:14px; margin-bottom:24px; text-align:left;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;">
-                <span style="color:#64748b;">Tipo:</span>
-                <span style="color:#D3DCED;">{{ reporte.tipo }}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;">
-                <span style="color:#64748b;">Monto:</span>
-                <span style="color:#38bdf8;">${{ reporte.total_monto|floatformat:2 }}</span>
-            </div>
             <div style="display:flex; justify-content:space-between; font-size:13px;">
-                <span style="color:#64748b;">Creado:</span>
-                <span style="color:#D3DCED;">{{ reporte.fecha_creacion|date:"d/m/Y" }}</span>
+                <span style="color:#64748b;">Reportes asignados:</span>
+                <span style="color:#D3DCED;">{{ categoria.reportes.count }}</span>
             </div>
+            {% if categoria.descripcion %}
+            <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:13px;">
+                <span style="color:#64748b;">Descripción:</span>
+                <span style="color:#D3DCED;">{{ categoria.descripcion }}</span>
+            </div>
+            {% endif %}
         </div>
 
         <form method="post" style="display:flex; gap:12px; justify-content:center;">
@@ -43,7 +41,7 @@
             <button type="submit" style="background:#991b1b; color:white; border:none; padding:12px 24px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">
                 Sí, eliminar
             </button>
-            <a href="{% url 'reportes:listar' %}">
+            <a href="{% url 'reportes:categorias' %}">
                 <button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer; font-size:15px;">
                     Cancelar
                 </button>
