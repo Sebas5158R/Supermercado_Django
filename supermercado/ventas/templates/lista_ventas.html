@@ -1,6 +1,41 @@
 {% extends "layout.html" %}
 
 {% block contenido %}
-    <h1>Listado de Ventas</h1>
-    <p>Aquí se mostrarán todas las ventas realizadas.</p>
+<div class="contenedorP">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1 style="margin:0;">Listado de Ventas</h1>
+        <a href="{% url 'ventas:crear_venta' %}">
+            <button
+                style="background:#38bdf8; color:#0f172a; border:none; padding:10px 18px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:14px;">
+                + Hacer una venta
+            </button>
+        </a>
+    </div>
+
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="padding:12px;">Total</th>
+                    <th style="padding:12px;">Fecha</th>
+                    <th style="padding:12px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venta in ventas %}
+                <tr>
+                    <td style="padding:10px 12px; font-weight:500;">$ {{ venta.total_venta }}</td>
+                    <td style="padding:10px 12px; font-weight:500;">{{ venta.fecha_venta }}</td>
+                    <td class="acciones" style="padding:10px 12px;">
+                        <a href="{% url 'ventas:detalle_venta' venta.id %}">
+                            <button title="Editar" style="background:#0369a1;">Ver detalles</button>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
