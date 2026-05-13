@@ -1,4 +1,5 @@
 from django.db import models
+from productos.models import Producto
 
 # Create your models here.
 class Venta(models.Model):
@@ -9,9 +10,15 @@ class Venta(models.Model):
         return f"Venta: {self.fecha_venta}, {self.total_venta}"
     
 class DetalleVenta(models.Model):
-    id_producto = models.IntegerField()
     cantidad = models.IntegerField()
     subtotal = models.DecimalField(max_digits=12, decimal_places=2)
+
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.PROTECT,
+        related_name='detalles_producto',
+        related_query_name='detalle_producto'
+    )
     
     venta = models.ForeignKey(
         Venta,
@@ -21,4 +28,4 @@ class DetalleVenta(models.Model):
     )
     
     def __str__(self):
-        return f"DetalleVenta: {self.id_producto}, {self.cantidad}"
+        return f"DetalleVenta: {self.cantidad}, {self.subtotal}, Producto: {self.producto.nombre_producto}"

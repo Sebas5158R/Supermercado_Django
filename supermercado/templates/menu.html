@@ -2,7 +2,9 @@
 <div class="barra">
     <h2>Supermercado Lolitas</h2>
     <div class="item-menu">Gestión de Productos</div>
-    <div class="item-menu">Gestión de Clientes/Ventas</div>
+    <a href="{% url 'ventas:lista_ventas' %}">
+        <div class="item-menu">Gestión de Clientes/Ventas</div>
+    </a>
     <a href="{% url 'terceros:lista_terceros' %}">
         <div class="item-menu">Gestión de Terceros</div>
     </a>
