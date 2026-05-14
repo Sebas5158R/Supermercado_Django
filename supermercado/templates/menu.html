@@ -1,7 +1,9 @@
 {% load static %}
 <div class="barra">
     <h2>Supermercado Lolitas</h2>
+     <a href="{% url 'productos:gestion_productos' %}">
     <div class="item-menu">Gestión de Productos</div>
+    </a>
     <a href="{% url 'ventas:lista_ventas' %}">
         <div class="item-menu">Gestión de Clientes/Ventas</div>
     </a>
