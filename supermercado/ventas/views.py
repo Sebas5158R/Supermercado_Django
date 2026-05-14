@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from . import models
+from . import forms
 
 def template_formulario(request):
-    return render(request, 'formulario_venta.html')
+    
+    return render(request, 'formulario_venta.html', {'form': forms.FormularioVenta})
 
 def getDetalle(request, venta_id):
 
