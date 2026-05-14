@@ -1,24 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Sum, Count, Avg, Q
-from django.utils import timezone
 from django.contrib import messages
 from . import models
 from .forms import ReporteForm
 from ventas.models import Venta, DetalleVenta
 from productos.models import Producto
-from inventarios.models import Inventario
 from terceros.models import Proveedor, Cliente
-import json
 from decimal import Decimal
 
 
 TIPOS_REPORTE = {
     'ventas': 'Reporte de Ventas',
-    'inventario': 'Reporte de Inventario',
     'productos': 'Reporte de Productos',
     'proveedores': 'Reporte de Proveedores',
 }
-
 
 def listar(request):
     buscar = request.GET.get('buscar', '')
@@ -74,11 +69,6 @@ def crear(request):
                 total = Producto.objects.aggregate(
                     t=Sum('precio')
                 )['t'] or Decimal('0')
-
-            elif tipo == 'inventario':
-                total = Decimal(Inventario.objects.aggregate(
-                    t=Sum('stock_actual')
-                )['t'] or 0)
 
             elif tipo == 'proveedores':
                 total = Decimal(Proveedor.objects.filter(activo=True).count())
@@ -238,19 +228,6 @@ def reportes(request, tipo):
             'sin_stock': sin_stock,
             'stock_bajo': stock_bajo,
             'valor_inventario': valor_total,
-        })
-
-    elif tipo == 'inventario':
-        qs = Inventario.objects.all().order_by('-fecha_ingreso')
-        total_entradas = qs.aggregate(e=Sum('cantidad_entradas'))['e'] or 0
-        total_salidas = qs.aggregate(s=Sum('cantidad_salidas'))['s'] or 0
-        stock_total = qs.aggregate(st=Sum('stock_actual'))['st'] or 0
-        contexto.update({
-            'inventarios': qs[:50],
-            'total_entradas': total_entradas,
-            'total_salidas': total_salidas,
-            'stock_total': stock_total,
-            'total_registros': qs.count(),
         })
 
     elif tipo == 'proveedores':

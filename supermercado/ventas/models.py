@@ -16,8 +16,8 @@ class DetalleVenta(models.Model):
     producto = models.ForeignKey(
         Producto,
         on_delete=models.PROTECT,
-        related_name='detalles_producto',
-        related_query_name='detalle_producto'
+        related_name='detalles_venta_producto',
+        related_query_name='detalle_venta_producto'
     )
     
     venta = models.ForeignKey(

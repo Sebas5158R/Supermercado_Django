@@ -3,7 +3,6 @@ from .models import Reporte
 
 TIPO_CHOICES = [
     ('ventas', 'Reporte de Ventas'),
-    ('inventario', 'Reporte de Inventario'),
     ('productos', 'Reporte de Productos'),
     ('proveedores', 'Reporte de Proveedores'),
 ]

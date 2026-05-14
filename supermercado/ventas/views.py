@@ -33,6 +33,9 @@ def template_formulario(request):
                 detalle.venta_id = venta.id
                 detalle.save()
                 
+                detalle.producto.stock -= detalle.cantidad
+                detalle.producto.save()
+                
             return  redirect('ventas:lista_ventas')
             
     return render(request, 'formulario_venta.html', {'form': forms.FormularioVenta, 'detalles_venta': detalles_venta})

@@ -14,21 +14,21 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Venta',
+            name='Compra',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('fecha_venta', models.DateField(auto_now_add=True)),
-                ('total_venta', models.DecimalField(decimal_places=2, max_digits=12)),
+                ('fecha_compra', models.DateField(auto_now_add=True)),
+                ('total_compra', models.DecimalField(decimal_places=2, max_digits=12)),
             ],
         ),
         migrations.CreateModel(
-            name='DetalleVenta',
+            name='DetalleCompra',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('cantidad', models.IntegerField()),
                 ('subtotal', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='detalles_venta_producto', related_query_name='detalle_venta_producto', to='productos.producto')),
-                ('venta', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='detalles_venta', related_query_name='detalle_venta', to='ventas.venta')),
+                ('compra', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='detalles_compra', related_query_name='detalle_compra', to='compras.compra')),
+                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='detalles_compra_producto', related_query_name='detalle_compra_producto', to='productos.producto')),
             ],
         ),
     ]
