@@ -44,9 +44,9 @@
                 </div>
 
                 <div style="display:flex; gap:12px; margin-top:8px;">
-                    <button name="accion" value="agregar_producto_venta" type="submit"
+                    <button name="accion" value="agregar_producto_compra" type="submit"
                         style="background:#38bdf8; color:#0f172a; border:none; padding:12px 28px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">
-                        Agregar venta
+                        Agregar compra
                     </button>
                     </a>
                 </div>
@@ -68,11 +68,11 @@
             </div>
 
             <div style="display:flex; gap:12px; margin-top:8px;">
-                <button name="accion" value="finalizar_venta" type="submit"
+                <button name="accion" value="finalizar_compra" type="submit"
                     style="background:#38bdf8; color:#0f172a; border:none; padding:12px 28px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">
-                    Finalizar venta
+                    Finalizar compra
                 </button>
-                <a href="{% url 'ventas:lista_ventas' %}">
+                <a href="{% url 'compras:lista_compras' %}">
                     <button type="button"
                         style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer; font-size:15px;">
                         Cancelar
@@ -98,15 +98,15 @@
                 </tr>
             </thead>
             <tbody>
-                {% for detalle_venta in detalles_venta %}
+                {% for detalle_compra in detalles_compra %}
                 <tr>
-                    <td style="padding:10px 12px; font-weight:500;">{{ detalle_venta.producto.nombre_producto }}</td>
-                    <td style="padding:10px 12px; font-weight:500;">${{ detalle_venta.producto.precio }}</td>
-                    <td style="padding:10px 12px; font-weight:500;">{{ detalle_venta.cantidad }}</td>
-                    <td style="padding:10px 12px; font-weight:500;">${{ detalle_venta.subtotal }}</td>
+                    <td style="padding:10px 12px; font-weight:500;">{{ detalle_compra.producto.nombre_producto }}</td>
+                    <td style="padding:10px 12px; font-weight:500;">${{ detalle_compra.producto.precio }}</td>
+                    <td style="padding:10px 12px; font-weight:500;">{{ detalle_compra.cantidad }}</td>
+                    <td style="padding:10px 12px; font-weight:500;">${{ detalle_compra.subtotal }}</td>
                     <td class="acciones" style="padding:10px 12px;">
-                        <a href="{% url 'ventas:eliminar_producto_venta' detalle_venta.id %}">
-                            <button title="Editar" style="background:#f87171;">Eliminar venta</button>
+                        <a href="{% url 'compras:eliminar_producto_compra' detalle_compra.id %}">
+                            <button title="Editar" style="background:#f87171;">Eliminar compra</button>
                         </a>
                     </td>
                 </tr>

@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block contenido %}
+<div class="contenedorP">
+
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+        <a href="{% url 'compras:lista_compras' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">←
+            Volver al
+            listado</a>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1 style="margin:0;">Detalles de la compra</h1>
+    </div>
+
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="padding:12px;">Producto</th>
+                    <th style="padding:12px;">Precio unitario</th>
+                    <th style="padding:12px;">Cantidad</th>
+                    <th style="padding:12px;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detalle_compra in detalles_compra %}
+                <tr>
+                    <td style="padding:10px 12px; font-weight:500;">{{ detalle_compra.producto.nombre_producto }}</td>
+                    <td style="padding:10px 12px; font-weight:500;">${{ detalle_compra.producto.precio }}</td>
+                    <td style="padding:10px 12px; font-weight:500;">{{ detalle_compra.cantidad }}</td>
+                    <td style="padding:10px 12px; font-weight:500;">${{ detalle_compra.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <br>
+
+    <div>
+        <h2 style="margin:0; color: aqua">Total: ${{compra.total_compra}}</h2>
+    </div>
+</div>
+{% endblock %}

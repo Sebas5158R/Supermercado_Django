@@ -22,11 +22,12 @@ def template_formulario(request):
             
         if accion == "finalizar_venta":
             total = 0
+            cliente_id = request.POST["cliente"]
             
             for detalle in detalles_venta:
                 total += detalle.subtotal
             
-            venta = models.Venta(total_venta = total)
+            venta = models.Venta(total_venta = total, cliente_id = cliente_id)
             venta.save()
             
             for detalle in detalles_venta:

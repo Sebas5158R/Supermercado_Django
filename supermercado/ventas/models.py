@@ -1,10 +1,16 @@
 from django.db import models
 from productos.models import Producto
+from terceros.models import Cliente
 
-# Create your models here.
 class Venta(models.Model):
     fecha_venta = models.DateField(auto_now_add=True)
     total_venta = models.DecimalField(max_digits=12, decimal_places=2)
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.PROTECT,
+        related_name='ventas_cliente',
+        related_query_name='venta_cliente'
+    )
     
     def __str__(self):
         return f"Venta: {self.fecha_venta}, {self.total_venta}"

@@ -10,7 +10,9 @@
     <a href="{% url 'terceros:lista_terceros' %}">
         <div class="item-menu">Gestión de Terceros</div>
     </a>
-    <div class="item-menu">Gestión de Inventarios</div>
+    <a href="{% url 'compras:lista_compras' %}">
+        <div class="item-menu">Gestión de Compras</div>
+    </a>
     <a href="{% url 'reportes:listar' %}" style="text-decoration:none;">
         <div class="item-menu {% block menu_reportes %}{% endblock %}">Gestión de Reportes</div>
     </a>

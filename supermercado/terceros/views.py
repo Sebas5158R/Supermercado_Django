@@ -61,7 +61,7 @@ def crear_tercero(request, tipo):
                     nombre=data['nombre'],
                     email=data['email'],
                     telefono=data['telefono'],
-                    activo=data['activo']
+                    activo=1
                 )
             elif tipo == 'proveedor':
                 models.Proveedor.objects.create(
@@ -70,8 +70,8 @@ def crear_tercero(request, tipo):
                     telefono=data['telefono'],
                     direccion=data['direccion'],
                     ciudad=data['ciudad'],
-                    estado=data['estado'],
-                    activo=data['activo']
+                    estado=1,
+                    activo=1
                 )
             messages.success(request, f"{tipo.capitalize()} creado exitosamente.")
             return redirect('terceros:lista_terceros')
@@ -108,11 +108,11 @@ def editar_tercero(request, tipo, id):
             tercero.nombre = data['nombre']
             tercero.email = data['email']
             tercero.telefono = data['telefono']
-            tercero.activo = data['activo']
+            tercero.activo = 1
             if tipo == 'proveedor':
                 tercero.direccion = data['direccion']
                 tercero.ciudad = data['ciudad']
-                tercero.estado = data['estado']
+                tercero.estado = 1
             tercero.save()
             
             messages.success(request, f"{tipo.capitalize()} actualizado exitosamente.")

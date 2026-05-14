@@ -3,6 +3,14 @@ from terceros.models import Proveedor
 from .models import Producto
 
 class FormularioProducto(forms.ModelForm):  
+        
+        proveedor = forms.ModelChoiceField(
+            queryset=Proveedor.objects.all(),
+            label="Selecciona el proveedor",
+            empty_label="--Elige un proveedor--",
+            widget=forms.Select(attrs={'class': 'form-select'})
+        )
+
         class Meta:
             model = Producto
             fields = ['nombre_producto', 'fecha_vencimiento', 'descripcion', 'precio', 'proveedor', 'stock', 'codigo_barras']
@@ -14,7 +22,5 @@ class FormularioProducto(forms.ModelForm):
                 'stock': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
                 'proveedor': forms.Select(attrs={'class': 'form-select'}),
                 'codigo_barras': forms.NumberInput(attrs={'class': 'form-input'}),
-            }  
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.fields['proveedor'].queryset = Proveedor.objects.all()
+                
+            }
