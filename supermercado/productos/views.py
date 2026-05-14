@@ -34,7 +34,7 @@ def crear_producto(request):
                 codigo_barras=data['codigo_barras']
             )
             messages.success(request, "Producto creado exitosamente.")
-            return redirect('productos:gestion_productos')  # ← corregido
+            return redirect('productos:gestion_productos')
     else:
         form = forms.FormularioProducto()
     
@@ -51,13 +51,13 @@ def editar_producto(request, id):
     Formulario = forms.FormularioProducto
 
     if request.method == 'POST':
-        form = Formulario(request.POST, instance=producto)  # ← vinculamos al objeto
+        form = Formulario(request.POST, instance=producto)
         if form.is_valid():
-            form.save()  # ← guarda todos los campos directamente
+            form.save()
             messages.success(request, "Producto actualizado exitosamente.")
-            return redirect('productos:gestion_productos')  # ← corregido
+            return redirect('productos:gestion_productos')
     else:
-        form = Formulario(instance=producto)  # ← carga datos del producto
+        form = Formulario(instance=producto)
 
     data = {
         'form': form,
@@ -72,5 +72,5 @@ def eliminar_producto(request, id):
     producto = models.Producto.objects.get(uuid_public=id)
     producto.delete()
     messages.success(request, "Producto eliminado exitosamente.")
-    return redirect('productos:gestion_productos')  # ← corregido
+    return redirect('productos:gestion_productos')
 

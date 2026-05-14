@@ -24,6 +24,8 @@ class DetalleVenta(models.Model):
         Venta,
         on_delete=models.PROTECT,
         related_name='detalles_venta',
+        null=True,
+        blank=True,
         related_query_name='detalle_venta'
     )
     

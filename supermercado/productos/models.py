@@ -12,5 +12,5 @@ class Producto(models.Model):
     stock = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"Producto: {self.nombre_producto}, {self.fecha_vencimiento}, {self.precio}"
+        return f"Producto: {self.nombre_producto} - {self.precio}"
     

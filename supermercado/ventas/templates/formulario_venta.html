@@ -24,16 +24,10 @@
             {% csrf_token %}
 
             <div style="display:flex; flex-direction:column; gap:18px;">
-                <div>
-                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{form.total_venta.label }}</label>
-                    {{ form.total_venta }}
-                    {% if form.total_venta.errors %}
-                    <span style="color:#fca5a5; font-size:12px;">{{ form.total_venta.errors.0 }}</span>
-                    {% endif %}
-                </div>
 
                 <div>
-                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{form.cantidad.label }}</label>
+                    <label
+                        style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{form.cantidad.label}}</label>
                     {{ form.cantidad }}
                     {% if form.cantidad.errors %}
                     <span style="color:#fca5a5; font-size:12px;">{{ form.cantidad.errors.0 }}</span>
@@ -41,7 +35,8 @@
                 </div>
 
                 <div>
-                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{form.producto.label }}</label>
+                    <label
+                        style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{form.producto.label}}</label>
                     {{ form.producto }}
                     {% if form.producto.errors %}
                     <span style="color:#fca5a5; font-size:12px;">{{ form.producto.errors.0 }}</span>
@@ -49,27 +44,66 @@
                 </div>
 
                 <div style="display:flex; gap:12px; margin-top:8px;">
-                    <button type="submit"
+                    <button name="accion" value="agregar_producto_venta" type="submit"
                         style="background:#38bdf8; color:#0f172a; border:none; padding:12px 28px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">
-                        Agregar venta del producto
+                        Agregar venta
                     </button>
-                    </a>
-                </div>
-
-                <div style="display:flex; gap:12px; margin-top:8px;">
-                    <button type="submit"
-                        style="background:#38bdf8; color:#0f172a; border:none; padding:12px 28px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">
-                        Finalizar venta
-                    </button>
-                    <a href="{% url 'ventas:lista_ventas' %}">
-                        <button type="button"
-                            style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer; font-size:15px;">
-                            Cancelar
-                        </button>
                     </a>
                 </div>
             </div>
         </form>
+
+        <br>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div style="display:flex; gap:12px; margin-top:8px;">
+                <button name="accion" value="finalizar_venta" type="submit"
+                    style="background:#38bdf8; color:#0f172a; border:none; padding:12px 28px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">
+                    Finalizar venta
+                </button>
+                <a href="{% url 'ventas:lista_ventas' %}">
+                    <button type="button"
+                        style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer; font-size:15px;">
+                        Cancelar
+                    </button>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <br>
+
+    <div>
+        <h2 style="color:#e2e8f0; margin-bottom:16px; font-size:20px;">Productos agregados a la venta</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="padding:12px;">Producto</th>
+                    <th style="padding:12px;">Precio unitario</th>
+                    <th style="padding:12px;">Cantidad</th>
+                    <th style="padding:12px;">Subtotal</th>
+                    <th style="padding:12px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detalle_venta in detalles_venta %}
+                <tr>
+                    <td style="padding:10px 12px; font-weight:500;">{{ detalle_venta.producto.nombre_producto }}</td>
+                    <td style="padding:10px 12px; font-weight:500;">${{ detalle_venta.producto.precio }}</td>
+                    <td style="padding:10px 12px; font-weight:500;">{{ detalle_venta.cantidad }}</td>
+                    <td style="padding:10px 12px; font-weight:500;">${{ detalle_venta.subtotal }}</td>
+                    <td class="acciones" style="padding:10px 12px;">
+                        <a href="{% url 'ventas:eliminar_producto_venta' detalle_venta.id %}">
+                            <button title="Editar" style="background:#f87171;">Eliminar venta</button>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
