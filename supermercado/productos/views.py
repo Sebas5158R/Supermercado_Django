@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
 from . import models
 from . import forms
 
@@ -13,7 +12,7 @@ def lista_productos(request):
     
     if buscar:
         productos = productos.filter(
-            Q(nombre_producto__icontains=buscar) | Q(descripcion__icontains=buscar)
+            Q(nombre_producto__icontains=buscar) | Q(descripcion__icontains=buscar) | Q(proveedor__nombre__icontains=buscar)
         )
     
     return render(request, 'gestion_productos.html', {'productos': productos})
@@ -30,6 +29,7 @@ def crear_producto(request):
                 fecha_vencimiento=data['fecha_vencimiento'],
                 descripcion=data['descripcion'],
                 precio=data['precio'],
+                proveedor=data['proveedor'],
                 stock=data['stock'],
                 codigo_barras=data['codigo_barras']
             )

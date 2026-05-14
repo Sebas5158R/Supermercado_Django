@@ -30,6 +30,15 @@
             </div>
 
             <div>
+               <label class="form-label">{{ form.proveedor.label }}</label>
+               {{ form.proveedor }}
+               {% if form.proveedor.errors %}
+               <span class="form-error
+               ">{{ form.proveedor.errors.0 }}</span>
+               {% endif %}
+            </div>
+
+            <div>
                <label class="form-label">{{ form.fecha_vencimiento.label }}</label>
                {{ form.fecha_vencimiento }}
                {% if form.fecha_vencimiento.errors %}

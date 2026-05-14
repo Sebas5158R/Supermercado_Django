@@ -29,7 +29,7 @@
                 type="text"
                 name="buscar"
                 value="{{ buscar }}"
-                placeholder="Buscar por nombre o descripción..."
+                placeholder="Buscar por proveedor, nombre o descripción..."
                 style="padding:8px 12px; border-radius:6px; border:none; background:#1e293b; color:#D3DCED; flex:1; min-width:200px;"
             >
             <button type="submit" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px 16px; border-radius:6px; cursor:pointer;">
@@ -47,6 +47,7 @@
         <table style="width:100%; border-collapse:collapse; background:#1e293b; color:#D3DCED;">
             <thead>
                 <tr style="background:#0f172a; text-align:left;">
+                    <th style="padding:12px;">Proveedor</th>
                     <th style="padding:12px;">Nombre</th>
                     <th style="padding:12px;">Precio</th>
                     <th style="padding:12px;">Stock</th>
@@ -59,6 +60,7 @@
             <tbody>
                 {% for producto in productos %}
                 <tr style="border-bottom:1px solid #334155;">
+                    <td style="padding:12px;">{{ producto.proveedor.nombre }}</td>
                     <td style="padding:12px;">{{ producto.nombre_producto }}</td>
                     <td style="padding:12px;">${{ producto.precio }}</td>
                     <td style="padding:12px;">{{ producto.stock }}</td>
