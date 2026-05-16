@@ -1,0 +1,195 @@
+{% extends "layout.html" %}
+{% load reporte_tags %}
+ 
+{% block contenido %}
+<div class="contenedorP">
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+        <div>
+            <a href="{% url 'reportes:listar' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver al listado</a>
+            <h1 style="margin:6px 0 4px 0;">{{ reporte.nombre }}</h1>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
+                <span style="background:#1e293b; color:#38bdf8; padding:3px 10px; border-radius:4px; font-size:12px;">{{ reporte.get_tipo_display }}</span>
+                {% if reporte.agrupacion %}<span style="background:#0f172a; color:#94a3b8; padding:3px 10px; border-radius:4px; font-size:12px;">Agrupado</span>{% endif %}
+                {% if reporte.filtros %}<span style="background:#0f172a; color:#f59e0b; padding:3px 10px; border-radius:4px; font-size:12px;">Filtros activos</span>{% endif %}
+                <span style="color:#475569; font-size:12px;">{{ resultado.cantidad }} registro(s) — Límite: {{ reporte.limite }}</span>
+            </div>
+            {% if reporte.descripcion %}<p style="color:#94a3b8; font-size:13px; margin:8px 0 0 0;">{{ reporte.descripcion }}</p>{% endif %}
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start;">
+            <a href="{% url 'reportes:exportar' reporte.id_reporte 'pdf' %}">
+                <button style="background:#dc2626; color:#fff; border:none; padding:9px 16px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:bold;">⬇ PDF</button>
+            </a>
+            <a href="{% url 'reportes:exportar' reporte.id_reporte 'excel' %}">
+                <button style="background:#16a34a; color:#fff; border:none; padding:9px 16px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:bold;">⬇ Excel</button>
+            </a>
+            <a href="{% url 'reportes:editar' reporte.id_reporte %}">
+                <button style="background:#0369a1; color:#fff; border:none; padding:9px 16px; border-radius:6px; cursor:pointer; font-size:13px;">Editar configuración</button>
+            </a>
+            <a href="{% url 'reportes:asignar_categorias' reporte.id_reporte %}">
+                <button style="background:#1e293b; color:#D3DCED; border:1px solid #334155; padding:9px 16px; border-radius:6px; cursor:pointer; font-size:13px;">Categorías</button>
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+    {% for m in messages %}
+    <div style="background:{% if m.tags == 'success' %}#064e3b{% else %}#7f1d1d{% endif %}; color:#D3DCED; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">{{ m }}</div>
+    {% endfor %}
+    {% endif %}
+
+    {% if totales %}
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:28px;">
+        {% for etiqueta, valor in totales.items %}
+        <div style="background:#1e293b; padding:18px 20px; border-radius:10px; border-left:4px solid #38bdf8; position:relative; overflow:hidden;">
+            <div style="color:#94a3b8; font-size:11px; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px;">{{ etiqueta }}</div>
+            <div style="color:#38bdf8; font-size:22px; font-weight:bold; line-height:1;">{{ valor }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if graficas %}
+    <div id="seccion-graficas" style="margin-bottom:32px;">
+        <div style="color:#D3DCED; font-size:15px; font-weight:bold; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+            <span style="color:#38bdf8;">▲</span> Análisis gráfico
+        </div>
+        <div id="contenedor-graficas" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:16px;">
+        </div>
+    </div>
+    {% endif %}
+
+    {% if filas %}
+    <div style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div style="color:#D3DCED; font-size:15px; font-weight:bold; display:flex; align-items:center; gap:8px;">
+            <span style="color:#38bdf8;">▦</span> Detalle de datos
+        </div>
+        {% if reporte.filtros %}
+        <div style="font-size:12px; color:#64748b; display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+            <span>Filtros:</span>
+            {% for k, v in reporte.filtros.items %}
+            <span style="background:#1e293b; padding:2px 8px; border-radius:4px; color:#94a3b8;">{{ k }}: {{ v }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <div style="overflow-x:auto; border-radius:8px; border:1px solid #1e293b;">
+        <table style="min-width:100%;">
+            <thead>
+                <tr>
+                    {% for col, etiqueta in etiquetas.items %}
+                    <th style="padding:12px 14px; white-space:nowrap;">{{ etiqueta }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for fila in filas %}
+                <tr>
+                    {% for col in etiquetas.keys %}
+                    <td style="padding:10px 14px;">{{ fila|get_item:col }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:50px; color:#94a3b8; background:#1e293b; border-radius:10px; margin-top:16px;">
+        <div style="font-size:44px; margin-bottom:12px;">📋</div>
+        <p style="margin-bottom:6px; font-size:15px; color:#D3DCED;">Sin datos con la configuración actual</p>
+        <p style="font-size:13px; margin-bottom:20px;">Ajusta los filtros o columnas para obtener resultados.</p>
+        <a href="{% url 'reportes:editar' reporte.id_reporte %}">
+            <button style="background:#38bdf8; color:#0f172a; border:none; padding:10px 22px; border-radius:6px; cursor:pointer; font-weight:bold;">Ajustar configuración</button>
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+var graficasData = {{ graficas_json|safe }};
+
+var COLORES_PRINCIPALES = ['#38bdf8','#34d399','#f59e0b','#f87171','#a78bfa','#fb923c','#4ade80','#60a5fa','#e879f9','#fbbf24'];
+var COLORES_PASTEL = ['#1d4ed8','#065f46','#78350f','#7f1d1d','#4c1d95','#9a3412','#14532d','#1e3a5f','#6b21a8','#92400e'];
+
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.borderColor = '#1e293b';
+
+var contenedor = document.getElementById('contenedor-graficas');
+if (contenedor && graficasData && Object.keys(graficasData).length > 0) {
+    Object.entries(graficasData).forEach(function(entrada) {
+        var clave = entrada[0];
+        var datos = entrada[1];
+        if (!datos.etiquetas || datos.etiquetas.length === 0) return;
+
+        var tarjeta = document.createElement('div');
+        tarjeta.style.cssText = 'background:#1e293b; border-radius:10px; padding:20px; border:1px solid #334155;';
+
+        var titulo = document.createElement('div');
+        titulo.textContent = datos.titulo || clave;
+        titulo.style.cssText = 'color:#D3DCED; font-size:13px; font-weight:bold; margin-bottom:16px; text-transform:uppercase; letter-spacing:0.5px;';
+        tarjeta.appendChild(titulo);
+
+        var canvas = document.createElement('canvas');
+        canvas.id = 'grafica_' + clave;
+        canvas.style.cssText = 'max-height:260px;';
+        tarjeta.appendChild(canvas);
+        contenedor.appendChild(tarjeta);
+
+        var esDoughnut = datos.tipo === 'doughnut';
+        var esLine = datos.tipo === 'line';
+
+        new Chart(canvas, {
+            type: datos.tipo,
+            data: {
+                labels: datos.etiquetas,
+                datasets: [{
+                    label: datos.titulo || '',
+                    data: datos.valores,
+                    backgroundColor: esDoughnut ? COLORES_PRINCIPALES : (esLine ? 'rgba(56,189,248,0.15)' : COLORES_PRINCIPALES),
+                    borderColor: esDoughnut ? COLORES_PRINCIPALES : (esLine ? '#38bdf8' : COLORES_PRINCIPALES),
+                    borderWidth: esDoughnut ? 2 : (esLine ? 2 : 0),
+                    borderRadius: esDoughnut ? 0 : 4,
+                    fill: esLine,
+                    tension: esLine ? 0.3 : 0,
+                    pointBackgroundColor: esLine ? '#38bdf8' : undefined,
+                    pointRadius: esLine ? 4 : undefined,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: esDoughnut,
+                        position: 'bottom',
+                        labels: { color: '#94a3b8', padding: 12, font: { size: 11 } }
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleColor: '#38bdf8',
+                        bodyColor: '#D3DCED',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                    }
+                },
+                scales: esDoughnut ? {} : {
+                    x: {
+                        grid: { color: '#1e293b' },
+                        ticks: { color: '#64748b', font: { size: 11 }, maxRotation: 35 }
+                    },
+                    y: {
+                        grid: { color: '#334155' },
+                        ticks: { color: '#64748b', font: { size: 11 } },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+} else if (contenedor) {
+    contenedor.closest('#seccion-graficas').style.display = 'none';
+}
+</script>
+{% endblock %}

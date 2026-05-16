@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block menu_productos %}menu-activo{% endblock %}
+{% block contenido %}
+<div class="contenedorP">
+    <a href="{% url 'productos:gestion_productos' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver</a>
+    <h1>Resumen diario — {{ hoy|date:"d/m/Y" }}</h1>
+    {% if messages %}{% for m in messages %}<div style="background:{% if m.tags == 'success' %}#064e3b{% elif m.tags == 'info' %}#1e3a5f{% else %}#7f1d1d{% endif %}; color:#D3DCED; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">{{ m }}</div>{% endfor %}{% endif %}
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:14px; margin-bottom:24px;">
+        <div style="background:#1e293b; padding:20px; border-radius:10px; border-left:4px solid #38bdf8;">
+            <div style="color:#94a3b8; font-size:11px; text-transform:uppercase; letter-spacing:.5px;">Ventas hoy</div>
+            <div style="color:#38bdf8; font-size:24px; font-weight:bold; margin-top:6px;">${{ resumen.ventas_hoy|floatformat:2 }}</div>
+            <div style="color:#64748b; font-size:12px; margin-top:4px;">{{ resumen.num_ventas }} transacción(es)</div>
+        </div>
+        <div style="background:#1e293b; padding:20px; border-radius:10px; border-left:4px solid #34d399;">
+            <div style="color:#94a3b8; font-size:11px; text-transform:uppercase; letter-spacing:.5px;">Compras hoy</div>
+            <div style="color:#34d399; font-size:24px; font-weight:bold; margin-top:6px;">${{ resumen.compras_hoy|floatformat:2 }}</div>
+            <div style="color:#64748b; font-size:12px; margin-top:4px;">{{ resumen.num_compras }} orden(es)</div>
+        </div>
+        <div style="background:#1e293b; padding:20px; border-radius:10px; border-left:4px solid {% if resumen.stock_critico %}#f59e0b{% else %}#34d399{% endif %};">
+            <div style="color:#94a3b8; font-size:11px; text-transform:uppercase; letter-spacing:.5px;">Stock crítico</div>
+            <div style="color:{% if resumen.stock_critico %}#f59e0b{% else %}#34d399{% endif %}; font-size:24px; font-weight:bold; margin-top:6px;">{{ resumen.stock_critico }}</div>
+            <div style="color:#64748b; font-size:12px; margin-top:4px;">producto(s) en alerta</div>
+        </div>
+    </div>
+    <div style="background:#1e293b; padding:20px; border-radius:8px;">
+        <div style="color:#94a3b8; font-size:13px; font-weight:bold; text-transform:uppercase; margin-bottom:14px;">Enviar resumen por correo</div>
+        <form method="post" style="display:flex; gap:10px; flex-wrap:wrap;">
+            {% csrf_token %}
+            <input type="email" name="email_destino" placeholder="gerencia@correo.com" required style="padding:10px 14px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; flex:1; min-width:250px;">
+            <button type="submit" style="background:#38bdf8; color:#0f172a; border:none; padding:10px 18px; border-radius:6px; font-weight:bold; cursor:pointer;">Enviar resumen</button>
+        </form>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
+        <a href="{% url 'productos:alertas_stock' %}"><button style="background:#1e293b; color:#f59e0b; border:1px solid #f59e0b; padding:9px 16px; border-radius:6px; cursor:pointer; font-size:13px;">⚠ Ver stock crítico</button></a>
+        <a href="{% url 'productos:alertas_vencimiento' %}"><button style="background:#1e293b; color:#f87171; border:1px solid #f87171; padding:9px 16px; border-radius:6px; cursor:pointer; font-size:13px;">📅 Ver vencimientos</button></a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block menu_ventas %}menu-activo{% endblock %}
+{% block contenido %}
+<div class="contenedorP">
+    <a href="{% url 'terceros:perfil_cliente' cliente.id %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver al perfil</a>
+    <h1>Historial de compras — {{ cliente.nombre }}</h1>
+    <div style="background:#1e293b; padding:14px 18px; border-radius:8px; margin-bottom:16px; border-left:3px solid #38bdf8;">
+        <span style="color:#94a3b8; font-size:13px;">Total histórico: </span>
+        <span style="color:#38bdf8; font-weight:bold; font-size:16px;">${{ total_comprado|floatformat:2 }}</span>
+    </div>
+    <table><thead><tr>
+        <th style="padding:12px;"># Venta</th><th style="padding:12px;">Fecha</th>
+        <th style="padding:12px;">Total</th><th style="padding:12px;">Estado</th>
+        <th style="padding:12px;">Acciones</th>
+    </tr></thead><tbody>
+    {% for v in ventas %}
+    <tr>
+        <td style="padding:10px 12px;">#{{ v.id }}</td>
+        <td style="padding:10px 12px;">{{ v.fecha_venta|date:"d/m/Y" }}</td>
+        <td style="padding:10px 12px; color:#38bdf8;">${{ v.total_venta|floatformat:2 }}</td>
+        <td style="padding:10px 12px;">
+            {% if v.estado == 'completada' %}<span style="background:#064e3b; color:#34d399; padding:3px 8px; border-radius:4px; font-size:12px;">Completada</span>
+            {% elif v.estado == 'anulada' %}<span style="background:#7f1d1d; color:#fca5a5; padding:3px 8px; border-radius:4px; font-size:12px;">Anulada</span>
+            {% else %}<span style="background:#78350f; color:#fcd34d; padding:3px 8px; border-radius:4px; font-size:12px;">Pendiente</span>{% endif %}
+        </td>
+        <td class="acciones" style="padding:10px 12px;"><a href="{% url 'ventas:detalle_venta' v.id %}"><button style="background:#0369a1;">Ver</button></a></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" style="padding:20px; text-align:center; color:#94a3b8;">Sin ventas registradas.</td></tr>
+    {% endfor %}
+    </tbody></table>
+</div>
+{% endblock %}

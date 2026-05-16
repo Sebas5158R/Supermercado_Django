@@ -4,8 +4,10 @@ from . import views
 app_name = 'ventas'
 
 urlpatterns = [
-    path('lista_ventas/', views.getVentas, name='lista_ventas'),
-    path('crear_venta/', views.template_formulario, name='crear_venta'),
-    path('detalle_venta/<int:venta_id>/', views.getDetalle, name='detalle_venta'),
-    path('eliminar_producto_venta/<int:producto_venta_id>/', views.deleteProductoVenta, name='eliminar_producto_venta'),
+    path('lista/', views.lista_ventas, name='lista_ventas'),
+    path('crear/', views.crear_venta, name='crear_venta'),
+    path('detalle/<int:venta_id>/', views.detalle_venta, name='detalle_venta'),
+    path('anular/<int:venta_id>/', views.anular_venta, name='anular_venta'),
+    path('eliminar_producto/<int:producto_venta_id>/', views.eliminar_producto_venta, name='eliminar_producto_venta'),
+    path('historial_cliente/<int:cliente_id>/', views.historial_cliente, name='historial_cliente'),
 ]

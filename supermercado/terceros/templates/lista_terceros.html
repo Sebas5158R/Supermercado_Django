@@ -1,115 +1,65 @@
 {% extends "layout.html" %}
-
+{% block menu_terceros %}menu-activo{% endblock %}
 {% block contenido %}
-
 <div class="contenedorP">
-
-    {% if messages %}
-        {% for message in messages %}
-        <div style="background:{% if message.tags == 'success' %}#064e3b{% else %}#7f1d1d{% endif %}; color:#D3DCED; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">
-            {{ message }}
-        </div>
-        {% endfor %}
-    {% endif %}
-
+    {% if messages %}{% for m in messages %}<div style="background:{% if m.tags == 'success' %}#064e3b{% else %}#7f1d1d{% endif %}; color:#D3DCED; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">{{ m }}</div>{% endfor %}{% endif %}
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h1 style="margin:0;">Listado de Terceros</h1>
-        <a href="{% url 'terceros:crear_tercero' 'cliente' %}">
-            <button
-                style="background:#38bdf8; color:#0f172a; border:none; padding:10px 18px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:14px;">
-                + Nuevo Cliente
-            </button>
-        </a>
-        <a href="{% url 'terceros:crear_tercero' 'proveedor' %}">
-            <button
-                style="background:#38bdf8; color:#0f172a; border:none; padding:10px 18px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:14px;">
-                + Nuevo Proveedor
-            </button>
-        </a>
+        <h1 style="margin:0;">Terceros</h1>
+        <div style="display:flex; gap:8px;">
+            <a href="{% url 'terceros:crear_tercero' 'cliente' %}"><button style="background:#38bdf8; color:#0f172a; border:none; padding:9px 16px; border-radius:6px; font-weight:bold; cursor:pointer;">+ Cliente</button></a>
+            <a href="{% url 'terceros:crear_tercero' 'proveedor' %}"><button style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:9px 16px; border-radius:6px; font-weight:bold; cursor:pointer;">+ Proveedor</button></a>
+        </div>
     </div>
-
-    <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; align-items:center;">
-        <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; width:100%;">
-            <input
-                type="text"
-                name="buscar"
-                value="{{ buscar }}"
-                placeholder="Buscar por nombre, identificacion, email o telefono..."
-                style="padding:8px 12px; border-radius:6px; border:none; background:#1e293b; color:#D3DCED; flex:1; min-width:200px;"
-            >
-            <select name="tipo" style="padding:8px; border-radius:6px; border:none; background:#1e293b; color:#D3DCED;">
-                <option value="">Todos los tipos</option>
-                <option value="cliente" {% if tipo_filtro == 'cliente' %}selected{% endif %}>Clientes</option>
-                <option value="proveedor" {% if tipo_filtro == 'proveedor' %}selected{% endif %}>Proveedores</option>
-
-            </select>
-            <select name="estado" style="padding:8px; border-radius:6px; border:none; background:#1e293b; color:#D3DCED;">
-                <option value="">Todos los estados</option>
-                <option value="activo" {% if estado_filtro == 'activo' %}selected{% endif %}>Activo</option>
-                <option value="inactivo" {% if estado_filtro == 'inactivo' %}selected{% endif %}>Inactivo</option>
-            </select>
-            <button type="submit" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px 16px; border-radius:6px; cursor:pointer;">
-                Filtrar
-            </button>
-            <a href="{% url 'terceros:lista_terceros' %}">
-                <button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:8px 16px; border-radius:6px; cursor:pointer;">
-                    Limpiar
-                </button>
-            </a>
-        </form>
-    </div>
-
-    <div>
-        <table>
-            <thead>
-                <tr>
-                    <th style="padding:12px;">Nombre</th>
-                    <th style="padding:12px;">Tipo</th>
-                    <th style="padding:12px;">Email</th>
-                    <th style="padding:12px;">Telefono</th>
-                    <th style="padding:12px;">Estado</th>
-                    <th style="padding:12px;">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for tercero in terceros %}
-                <tr>
-                    <td style="padding:10px 12px; font-weight:500;">{{ tercero.nombre }}</td>
-                    <td style="padding:10px 12px;">
-                        {% if tercero.rol == 'Cliente' %}
-                        <span
-                            style="background:#1e3a8a; color:#93c5fd; padding:3px 8px; border-radius:4px; font-size:12px;">Cliente</span>
-                        {% else %}
-                        <span
-                            style="background:#7c2d12; color:#fdba74; padding:3px 8px; border-radius:4px; font-size:12px;">Proveedor</span>
-                        {% endif %}
-                    </td>
-                    <td style="padding:10px 12px;">{{ tercero.email }}</td>
-                    <td style="padding:10px 12px;">{{ tercero.telefono }}</td>
-                    <td style="padding:10px 12px;">
-                        {% if tercero.activo %}
-                        <span
-                            style="background:#064e3b; color:#34d399; padding:3px 8px; border-radius:4px; font-size:12px;">Activo</span>
-                        {% else %}
-                        <span
-                            style="background:#7f1d1d; color:#fca5a5; padding:3px 8px; border-radius:4px; font-size:12px;">Inactivo</span>
-                        {% endif %}
-                    </td>
-                    <td class="acciones" style="padding:10px 12px;">
-                        <a href="{% url 'terceros:editar_tercero' tercero.rol|lower tercero.id %}">
-                            <button title="Editar" style="background:#0369a1;">Editar</button>
-                        </a>
-                        <a href="{% url 'terceros:eliminar_tercero' tercero.rol|lower tercero.id %}">
-                            <button title="Eliminar" style="background:#991b1b;">Eliminar</button>
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-
+    <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+        <input type="text" name="buscar" value="{{ buscar }}" placeholder="Buscar por nombre, email o teléfono..." style="padding:8px 12px; border-radius:6px; border:none; background:#1e293b; color:#D3DCED; flex:1; min-width:200px;">
+        <select name="tipo" style="padding:8px; border-radius:6px; border:none; background:#1e293b; color:#D3DCED;">
+            <option value="">Todos</option>
+            <option value="cliente" {% if tipo_filtro == 'cliente' %}selected{% endif %}>Clientes</option>
+            <option value="proveedor" {% if tipo_filtro == 'proveedor' %}selected{% endif %}>Proveedores</option>
+        </select>
+        <select name="estado" style="padding:8px; border-radius:6px; border:none; background:#1e293b; color:#D3DCED;">
+            <option value="">Todos los estados</option>
+            <option value="activo" {% if estado_filtro == 'activo' %}selected{% endif %}>Activos</option>
+            <option value="inactivo" {% if estado_filtro == 'inactivo' %}selected{% endif %}>Inactivos</option>
+        </select>
+        <button type="submit" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px 16px; border-radius:6px; cursor:pointer;">Filtrar</button>
+        <a href="{% url 'terceros:lista_terceros' %}"><button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:8px 14px; border-radius:6px; cursor:pointer;">Limpiar</button></a>
+    </form>
+    <table><thead><tr>
+        <th style="padding:12px;">Tipo</th><th style="padding:12px;">Nombre</th>
+        <th style="padding:12px;">Email</th><th style="padding:12px;">Teléfono</th>
+        <th style="padding:12px;">Estado</th><th style="padding:12px;">Acciones</th>
+    </tr></thead><tbody>
+    {% for t in terceros %}
+    <tr>
+        <td style="padding:10px 12px;">
+            <span style="background:{% if t.rol == 'Cliente' %}#0369a1{% else %}#065f46{% endif %}; color:white; padding:3px 8px; border-radius:4px; font-size:11px;">{{ t.rol }}</span>
+        </td>
+        <td style="padding:10px 12px; font-weight:500;">
+            {% if t.rol == 'Cliente' %}<a href="{% url 'terceros:perfil_cliente' t.id %}" style="color:#38bdf8; text-decoration:none;">{{ t.nombre }}</a>
+            {% else %}<a href="{% url 'terceros:perfil_proveedor' t.id %}" style="color:#38bdf8; text-decoration:none;">{{ t.nombre }}</a>{% endif %}
+        </td>
+        <td style="padding:10px 12px; font-size:13px;">{{ t.email }}</td>
+        <td style="padding:10px 12px; font-size:13px;">{{ t.telefono }}</td>
+        <td style="padding:10px 12px;">
+            {% if t.activo %}<span style="background:#064e3b; color:#34d399; padding:3px 8px; border-radius:4px; font-size:12px;">Activo</span>
+            {% else %}<span style="background:#7f1d1d; color:#fca5a5; padding:3px 8px; border-radius:4px; font-size:12px;">Inactivo</span>{% endif %}
+        </td>
+        <td class="acciones" style="padding:10px 12px;">
+            {% if t.rol == 'Cliente' %}
+            <a href="{% url 'terceros:perfil_cliente' t.id %}"><button style="background:#0369a1;">Perfil</button></a>
+            <a href="{% url 'terceros:editar_tercero' 'cliente' t.id %}"><button>Editar</button></a>
+            <form method="post" action="{% url 'terceros:cambiar_estado' 'cliente' t.id %}" style="display:inline;">{% csrf_token %}<button type="submit" style="background:#78350f;">{% if t.activo %}Desact.{% else %}Activar{% endif %}</button></form>
+            {% else %}
+            <a href="{% url 'terceros:perfil_proveedor' t.id %}"><button style="background:#065f46;">Perfil</button></a>
+            <a href="{% url 'terceros:editar_tercero' 'proveedor' t.id %}"><button>Editar</button></a>
+            <form method="post" action="{% url 'terceros:cambiar_estado' 'proveedor' t.id %}" style="display:inline;">{% csrf_token %}<button type="submit" style="background:#78350f;">{% if t.activo %}Desact.{% else %}Activar{% endif %}</button></form>
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6" style="padding:20px; text-align:center; color:#94a3b8;">Sin resultados.</td></tr>
+    {% endfor %}
+    </tbody></table>
 </div>
-
 {% endblock %}

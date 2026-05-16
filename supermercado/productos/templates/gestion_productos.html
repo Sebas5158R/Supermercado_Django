@@ -1,91 +1,70 @@
 {% extends "layout.html" %}
-
+{% block menu_productos %}menu-activo{% endblock %}
 {% block contenido %}
-
 <div class="contenedorP">
-    
-    {% if messages %}
-        {% for message in messages %}
-        <div style="background:{% if message.tags == 'success' %}#064e3b{% else %}#7f1d1d{% endif %}; 
-                    color:#D3DCED; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">
-            {{ message }}
-        </div>
-        {% endfor %}
-    {% endif %}
-
+    {% if messages %}{% for m in messages %}<div style="background:{% if m.tags == 'success' %}#064e3b{% else %}#7f1d1d{% endif %}; color:#D3DCED; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">{{ m }}</div>{% endfor %}{% endif %}
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h1 style="margin:0;">Gestión de Productos</h1>
-        <a href="{% url 'productos:crear_producto' %}">
-            <button
-                style="background:#38bdf8; color:#0f172a; border:none; padding:10px 18px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:14px;">
-                + Nuevo Producto
-            </button>
+        <h1 style="margin:0;">Productos</h1>
+        <a href="{% url 'productos:crear_producto' %}"><button style="background:#38bdf8; color:#0f172a; border:none; padding:10px 18px; border-radius:6px; font-weight:bold; cursor:pointer;">+ Nuevo producto</button></a>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:10px; margin-bottom:20px;">
+        <a href="{% url 'productos:alertas_stock' %}" style="text-decoration:none;">
+            <div style="background:#1e293b; padding:14px; border-radius:8px; border-left:3px solid #f59e0b; cursor:pointer;">
+                <div style="color:#94a3b8; font-size:11px; text-transform:uppercase;">Stock crítico</div>
+                <div style="color:#f59e0b; font-size:20px; font-weight:bold;">{{ total_criticos }}</div>
+            </div>
+        </a>
+        <a href="?alerta=vencimiento" style="text-decoration:none;">
+            <div style="background:#1e293b; padding:14px; border-radius:8px; border-left:3px solid #ef4444; cursor:pointer;">
+                <div style="color:#94a3b8; font-size:11px; text-transform:uppercase;">Por vencer (30d)</div>
+                <div style="color:#ef4444; font-size:20px; font-weight:bold;">{{ total_por_vencer }}</div>
+            </div>
+        </a>
+        <a href="{% url 'productos:top_productos' %}" style="text-decoration:none;">
+            <div style="background:#1e293b; padding:14px; border-radius:8px; border-left:3px solid #34d399; cursor:pointer;">
+                <div style="color:#94a3b8; font-size:11px; text-transform:uppercase;">Top ventas</div>
+                <div style="color:#34d399; font-size:16px; font-weight:bold; margin-top:4px;">Ver ranking</div>
+            </div>
         </a>
     </div>
-
-    <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; align-items:center">
-        <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; width:100%;">
-            <input
-                type="text"
-                name="buscar"
-                value="{{ buscar }}"
-                placeholder="Buscar por proveedor, nombre o descripción..."
-                style="padding:8px 12px; border-radius:6px; border:none; background:#1e293b; color:#D3DCED; flex:1; min-width:200px;"
-            >
-            <button type="submit" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px 16px; border-radius:6px; cursor:pointer;">
-                Filtrar
-            </button>
-            <a href="{% url 'productos:gestion_productos' %}">
-                <button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:8px 16px; border-radius:6px; cursor:pointer;">
-                    Limpiar
-                </button>
-            </a>
-       </form>
-    </div>
-
-    <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse; background:#1e293b; color:#D3DCED;">
-            <thead>
-                <tr style="background:#0f172a; text-align:left;">
-                    <th style="padding:12px;">Proveedor</th>
-                    <th style="padding:12px;">Nombre</th>
-                    <th style="padding:12px;">Precio</th>
-                    <th style="padding:12px;">Stock</th>
-                    <th style="padding:12px;">Descripción</th>
-                    <th style="padding:12px;">Código de Barras</th>
-                    <th style="padding:12px;">Fecha Vencimiento</th>
-                    <th style="padding:12px;">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for producto in productos %}
-                <tr style="border-bottom:1px solid #334155;">
-                    <td style="padding:12px;">{{ producto.proveedor.nombre }}</td>
-                    <td style="padding:12px;">{{ producto.nombre_producto }}</td>
-                    <td style="padding:12px;">${{ producto.precio }}</td>
-                    <td style="padding:12px;">{{ producto.stock }}</td>
-                    <td style="padding:12px;">{{ producto.descripcion }}</td>
-                    <td style="padding:12px;">{{ producto.codigo_barras }}</td>
-                    <td style="padding:12px;">{{ producto.fecha_vencimiento }}</td>
-                    <td style="padding:12px;">
-                        <a href="{% url 'productos:editar_producto' producto.uuid_public %}" 
-                           style="color:#38bdf8; text-decoration:none; margin-right:8px;">Editar</a>
-                        <a href="{% url 'productos:eliminar_producto' producto.uuid_public %}" 
-                           style="color:#f87171; text-decoration:none;">Eliminar</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7" style="padding:12px; text-align:center; color:#94a3b8;">
-                        No hay productos disponibles.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+        <input type="text" name="buscar" value="{{ buscar }}" placeholder="Buscar por nombre, descripción o proveedor..." style="padding:8px 12px; border-radius:6px; border:none; background:#1e293b; color:#D3DCED; flex:1; min-width:200px;">
+        <select name="proveedor" style="padding:8px; border-radius:6px; border:none; background:#1e293b; color:#D3DCED;">
+            <option value="">Todos los proveedores</option>
+            {% for prov in proveedores %}<option value="{{ prov.id }}" {% if proveedor_id == prov.id|stringformat:"s" %}selected{% endif %}>{{ prov.nombre }}</option>{% endfor %}
+        </select>
+        <select name="alerta" style="padding:8px; border-radius:6px; border:none; background:#1e293b; color:#D3DCED;">
+            <option value="">Sin filtro de alerta</option>
+            <option value="stock" {% if alerta == 'stock' %}selected{% endif %}>Stock crítico</option>
+            <option value="vencimiento" {% if alerta == 'vencimiento' %}selected{% endif %}>Por vencer</option>
+        </select>
+        <button type="submit" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px 16px; border-radius:6px; cursor:pointer;">Filtrar</button>
+        <a href="{% url 'productos:gestion_productos' %}"><button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:8px 14px; border-radius:6px; cursor:pointer;">Limpiar</button></a>
+    </form>
+    <table><thead><tr>
+        <th style="padding:12px;">Nombre</th><th style="padding:12px;">Proveedor</th>
+        <th style="padding:12px;">Precio</th><th style="padding:12px;">Stock</th>
+        <th style="padding:12px;">Vencimiento</th><th style="padding:12px;">Código barras</th>
+        <th style="padding:12px;">Acciones</th>
+    </tr></thead><tbody>
+    {% for p in productos %}
+    <tr>
+        <td style="padding:10px 12px; font-weight:500;">{{ p.nombre_producto }}</td>
+        <td style="padding:10px 12px;">{{ p.proveedor.nombre }}</td>
+        <td style="padding:10px 12px; color:#38bdf8;">${{ p.precio|floatformat:2 }}</td>
+        <td style="padding:10px 12px;">
+            <span style="{% if p.stock == 0 %}color:#ef4444;{% elif p.stock <= 10 %}color:#f59e0b;{% else %}color:#34d399;{% endif %} font-weight:bold;">{{ p.stock }}</span>
+        </td>
+        <td style="padding:10px 12px;">{{ p.fecha_vencimiento|date:"d/m/Y" }}</td>
+        <td style="padding:10px 12px; font-size:12px; color:#94a3b8;">{{ p.codigo_barras }}</td>
+        <td class="acciones" style="padding:10px 12px;">
+            <a href="{% url 'productos:editar_producto' p.uuid_public %}"><button>Editar</button></a>
+            <a href="{% url 'productos:eliminar_producto' p.uuid_public %}"><button style="background:#991b1b;">Eliminar</button></a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7" style="padding:20px; text-align:center; color:#94a3b8;">Sin productos.</td></tr>
+    {% endfor %}
+    </tbody></table>
 </div>
-
-
-
 {% endblock %}

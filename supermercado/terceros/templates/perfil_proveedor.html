@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block menu_terceros %}menu-activo{% endblock %}
+{% block contenido %}
+<div class="contenedorP">
+    <a href="{% url 'terceros:lista_terceros' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver</a>
+    <h1>{{ proveedor.nombre }}</h1>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:12px; margin-bottom:24px;">
+        <div style="background:#1e293b; padding:14px; border-radius:8px; border-left:3px solid #38bdf8;"><div style="color:#94a3b8; font-size:11px; text-transform:uppercase;">Total comprado</div><div style="color:#38bdf8; font-size:20px; font-weight:bold;">${{ total_comprado|floatformat:2 }}</div></div>
+        <div style="background:#1e293b; padding:14px; border-radius:8px; border-left:3px solid #34d399;"><div style="color:#94a3b8; font-size:11px; text-transform:uppercase;">N° compras</div><div style="color:#34d399; font-size:20px; font-weight:bold;">{{ compras.count }}</div></div>
+        <div style="background:#1e293b; padding:14px; border-radius:8px;"><div style="color:#94a3b8; font-size:11px; text-transform:uppercase;">Contacto</div><div style="color:#D3DCED; font-size:12px; margin-top:4px;">{{ proveedor.email }}</div><div style="color:#D3DCED; font-size:12px;">{{ proveedor.telefono }}</div></div>
+        <div style="background:#1e293b; padding:14px; border-radius:8px;"><div style="color:#94a3b8; font-size:11px; text-transform:uppercase;">Ciudad</div><div style="color:#D3DCED; font-size:13px; margin-top:4px;">{{ proveedor.ciudad }}</div></div>
+    </div>
+    <div style="display:flex; gap:8px; margin-bottom:20px;">
+        <a href="{% url 'compras:historial_proveedor' proveedor.id %}"><button style="background:#065f46; color:white; border:none; padding:9px 16px; border-radius:6px; cursor:pointer; font-size:13px;">Ver historial de compras</button></a>
+        <a href="{% url 'terceros:editar_tercero' 'proveedor' proveedor.id %}"><button style="background:#1e293b; color:#D3DCED; border:1px solid #334155; padding:9px 16px; border-radius:6px; cursor:pointer; font-size:13px;">Editar</button></a>
+    </div>
+    {% if productos %}
+    <h2 style="color:#D3DCED; font-size:16px; margin-bottom:12px;">Productos suministrados ({{ productos.count }})</h2>
+    <table><thead><tr>
+        <th style="padding:10px;">Producto</th><th style="padding:10px;">Precio</th><th style="padding:10px;">Stock</th><th style="padding:10px;">Vencimiento</th>
+    </tr></thead><tbody>
+    {% for p in productos %}
+    <tr>
+        <td style="padding:8px 10px;">{{ p.nombre_producto }}</td>
+        <td style="padding:8px 10px;">${{ p.precio|floatformat:2 }}</td>
+        <td style="padding:8px 10px;"><span style="{% if p.stock <= 10 %}color:#f59e0b;{% else %}color:#34d399;{% endif %} font-weight:bold;">{{ p.stock }}</span></td>
+        <td style="padding:8px 10px;">{{ p.fecha_vencimiento|date:"d/m/Y" }}</td>
+    </tr>
+    {% endfor %}
+    </tbody></table>
+    {% endif %}
+</div>
+{% endblock %}

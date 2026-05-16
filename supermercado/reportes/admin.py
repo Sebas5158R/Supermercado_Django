@@ -4,7 +4,7 @@ from .models import Reporte, CategoriaReporte
 
 @admin.register(Reporte)
 class ReporteAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'tipo', 'total_monto', 'fecha_creacion', 'usuario_creacion', 'activo_tf')
+    list_display = ('nombre', 'tipo', 'fecha_creacion', 'usuario_creacion', 'limite', 'activo_tf')
     list_filter = ('tipo', 'activo_tf', 'fecha_creacion')
     search_fields = ('nombre', 'descripcion', 'usuario_creacion')
     readonly_fields = ('id_reporte', 'fecha_creacion')

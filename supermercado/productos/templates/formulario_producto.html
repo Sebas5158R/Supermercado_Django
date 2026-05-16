@@ -1,148 +1,26 @@
 {% extends "layout.html" %}
-
+{% block menu_productos %}menu-activo{% endblock %}
 {% block contenido %}
 <div class="contenedorP">
-   <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
-      <a href="{% url 'productos:gestion_productos' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">
-         ← Volver al listado de productos
-      </a>
-   </div>
-
-   <h1>{{ accion }} Producto</h1>
-
-   <div style="max-width:640px; margin:0 auto;">
-      {% if form.errors %}
-      <div style="color:#fca5a5; margin-bottom:16px;">
-         {{ form.errors }}
-      </div>
-      {% endif %}
-
-      <form method="post">
-         {% csrf_token %}
-         <div style="display:flex; flex-direction:column; gap:18px;">
-
+    <a href="{% url 'productos:gestion_productos' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver</a>
+    <h1>{{ accion }} producto</h1>
+    {% if messages %}{% for m in messages %}<div style="background:#7f1d1d; color:#fca5a5; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">{{ m }}</div>{% endfor %}{% endif %}
+    <form method="post" style="max-width:600px;">
+        {% csrf_token %}
+        <div style="display:flex; flex-direction:column; gap:16px;">
+            {% for campo in form %}
             <div>
-               <label class="form-label">{{ form.nombre_producto.label }}</label>
-               {{ form.nombre_producto }}
-               {% if form.nombre_producto.errors %}
-               <span class="form-error">{{ form.nombre_producto.errors.0 }}</span>
-               {% endif %}
+                <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ campo.label }}</label>
+                {{ campo }}
+                {% if campo.errors %}<span style="color:#fca5a5; font-size:12px;">{{ campo.errors.0 }}</span>{% endif %}
             </div>
-
-            <div>
-               <label class="form-label">{{ form.proveedor.label }}</label>
-               {{ form.proveedor }}
-               {% if form.proveedor.errors %}
-               <span class="form-error
-               ">{{ form.proveedor.errors.0 }}</span>
-               {% endif %}
+            {% endfor %}
+            <div style="display:flex; gap:12px;">
+                <button type="submit" style="background:#38bdf8; color:#0f172a; border:none; padding:12px 28px; border-radius:6px; font-weight:bold; cursor:pointer;">{{ accion }} producto</button>
+                <a href="{% url 'productos:gestion_productos' %}"><button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer;">Cancelar</button></a>
             </div>
-
-            <div>
-               <label class="form-label">{{ form.fecha_vencimiento.label }}</label>
-               {{ form.fecha_vencimiento }}
-               {% if form.fecha_vencimiento.errors %}
-               <span class="form-error">{{ form.fecha_vencimiento.errors.0 }}</span>
-               {% endif %}
-            </div>
-
-            <div>
-               <label class="form-label">{{ form.precio.label }}</label>
-               {{ form.precio }}
-               {% if form.precio.errors %}
-               <span class="form-error">{{ form.precio.errors.0 }}</span>
-               {% endif %}
-            </div>
-
-            <div>
-               <label class="form-label">{{ form.stock.label }}</label>
-               {{ form.stock }}
-               {% if form.stock.errors %}
-               <span class="form-error">{{ form.stock.errors.0 }}</span>
-               {% endif %}
-            </div>
-
-            <div>
-               <label class="form-label">{{ form.descripcion.label }}</label>
-               {{ form.descripcion }}
-               {% if form.descripcion.errors %}
-               <span class="form-error">{{ form.descripcion.errors.0 }}</span>
-               {% endif %}
-            </div>
-
-            <div>
-               <label class="form-label">{{ form.codigo_barras.label }}</label>
-               {{ form.codigo_barras }}
-               {% if form.codigo_barras.errors %}
-               <span class="form-error">{{ form.codigo_barras.errors.0 }}</span>
-               {% endif %}
-            </div>
-
-           <div style="display:flex; gap:12px; margin-top:8px;">
-                    <button type="submit" style="background:#38bdf8; color:#0f172a; border:none; padding:12px 28px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">
-                        {{ accion }} Producto
-                    </button>
-                    <a href="{% url 'productos:gestion_productos' %}">
-                        <button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer; font-size:15px;">
-                            Cancelar
-                        </button>
-                    </a>
-                </div>
-         </div>
-      </form>
-   </div>
+        </div>
+    </form>
 </div>
-
-<style>
-   .form-label {
-      display:block;
-      color:#94a3b8;
-      font-size:13px;
-      margin-bottom:6px;
-   }
-   .form-input {
-      width: 100%;
-      padding: 10px 14px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 6px;
-      color: #D3DCED;
-      font-size: 14px;
-      box-sizing: border-box;
-   }
-   .form-input:focus {
-      outline: none;
-      border-color: #38bdf8;
-   }
-   .form-error {
-      color:#fca5a5;
-      font-size:12px;
-   }
-   .btn-primary {
-      background:#38bdf8;
-      color:#0f172a;
-      border:none;
-      padding:12px 28px;
-      border-radius:6px;
-      font-weight:bold;
-      cursor:pointer;
-      font-size:15px;
-      margin-top:12px;
-   }
-   .form-select {
-        width: 100%;
-        padding: 10px 14px;
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 6px;
-        color: #D3DCED;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-
-    .form-select:focus {
-        outline: none;
-        border-color: #38bdf8;
-    }
-</style>
+<style>.form-input,.form-select{width:100%;padding:10px 14px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#D3DCED;font-size:14px;box-sizing:border-box;}.form-input:focus,.form-select:focus{outline:none;border-color:#38bdf8;}</style>
 {% endblock %}

@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block menu_compras %}menu-activo{% endblock %}
+{% block contenido %}
+<div class="contenedorP">
+    <a href="{% url 'compras:detalle_compra' compra.id %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver</a>
+    <h1>Anular compra</h1>
+    <div style="max-width:500px; margin:30px auto; background:#1e293b; border-radius:10px; padding:32px; text-align:center; border:1px solid #7f1d1d;">
+        <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+        <h2 style="color:#fca5a5; margin-bottom:12px;">¿Anular compra #{{ compra.id }}?</h2>
+        <p style="color:#94a3b8; font-size:14px; margin-bottom:20px;">El stock agregado por esta compra se descontará. Esta acción no se puede deshacer.</p>
+        <form method="post" style="display:flex; gap:12px; justify-content:center;">
+            {% csrf_token %}
+            <button type="submit" style="background:#991b1b; color:white; border:none; padding:12px 24px; border-radius:6px; font-weight:bold; cursor:pointer;">Sí, anular</button>
+            <a href="{% url 'compras:detalle_compra' compra.id %}"><button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer;">Cancelar</button></a>
+        </form>
+    </div>
+</div>
+{% endblock %}

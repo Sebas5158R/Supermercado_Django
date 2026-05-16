@@ -1,129 +1,207 @@
 {% extends "layout.html" %}
-
-{% block menu_reportes %}menu-activo{% endblock %}
-
+ 
 {% block contenido %}
 <div class="contenedorP">
-
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
-        <a href="{% url 'reportes:listar' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver al listado</a>
-    </div>
-
-    <h1>{{ accion }} Reporte</h1>
+    <a href="{% url 'reportes:listar' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver</a>
+    <h1>{{ accion }} reporte</h1>
 
     {% if messages %}
-    {% for message in messages %}
-    <div style="background:#7f1d1d; color:#fca5a5; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">
-        {{ message }}
-    </div>
+    {% for m in messages %}
+    <div style="background:#7f1d1d; color:#fca5a5; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">{{ m }}</div>
     {% endfor %}
     {% endif %}
 
-    <div style="max-width:640px; margin:0 auto;">
-        <form method="post">
-            {% csrf_token %}
+    <form method="post" style="max-width:760px;">
+        {% csrf_token %}
+        <div style="display:flex; flex-direction:column; gap:22px;">
 
-            <div style="display:flex; flex-direction:column; gap:18px;">
-
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
                 <div>
-                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.nombre.label }}</label>
-                    {{ form.nombre }}
-                    {% if form.nombre.errors %}
-                    <span style="color:#fca5a5; font-size:12px;">{{ form.nombre.errors.0 }}</span>
-                    {% endif %}
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">Nombre del reporte *</label>
+                    <input type="text" name="nombre" value="{% if reporte %}{{ reporte.nombre }}{% endif %}" required
+                        placeholder="Ej: Ventas del mes de mayo"
+                        style="width:100%; padding:10px 14px; background:#1e293b; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">Creado por</label>
+                    <input type="text" name="usuario_creacion" value="{% if reporte %}{{ reporte.usuario_creacion }}{% else %}admin{% endif %}"
+                        style="width:100%; padding:10px 14px; background:#1e293b; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; box-sizing:border-box;">
+                </div>
+            </div>
+
+            <div>
+                <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">Tipo de reporte *</label>
+                <select name="tipo" id="id_tipo" onchange="actualizarFormulario()"
+                    style="width:100%; padding:10px 14px; background:#1e293b; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; box-sizing:border-box;">
+                    {% for clave, etiqueta in tipos %}
+                    <option value="{{ clave }}"
+                        {% if reporte and reporte.tipo == clave %}selected
+                        {% elif not reporte and tipo_inicial == clave %}selected{% endif %}>
+                        {{ etiqueta }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <p style="font-size:12px; color:#64748b; margin-top:5px;">El tipo determina qué datos se consultan en tiempo real cada vez que se visualice el reporte.</p>
+            </div>
+
+            <div style="background:#1e293b; border-radius:10px; padding:20px;">
+                <div style="color:#D3DCED; font-size:14px; font-weight:bold; margin-bottom:4px;">Columnas a mostrar en el reporte</div>
+                <div style="color:#64748b; font-size:12px; margin-bottom:14px;">Selecciona qué información deseas ver en la tabla de resultados. Puedes elegir una o varias columnas.</div>
+                <div id="cols_dinamicas" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+                <p id="cols_hint" style="color:#475569; font-size:12px; margin-top:10px; display:none;">Ninguna columna seleccionada: se usarán las columnas predeterminadas del tipo elegido.</p>
+            </div>
+
+            <div style="background:#1e293b; border-radius:10px; padding:20px;">
+                <div style="color:#D3DCED; font-size:14px; font-weight:bold; margin-bottom:4px;">Filtros de datos</div>
+                <div style="color:#64748b; font-size:12px; margin-bottom:14px;">Limita los resultados a un rango de fechas o a un tercero específico.</div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+                    <div>
+                        <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">Fecha desde</label>
+                        <input type="date" name="fecha_desde" value="{% if reporte %}{{ reporte.filtros.fecha_desde }}{% endif %}"
+                            style="width:100%; padding:10px 14px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">Fecha hasta</label>
+                        <input type="date" name="fecha_hasta" value="{% if reporte %}{{ reporte.filtros.fecha_hasta }}{% endif %}"
+                            style="width:100%; padding:10px 14px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; box-sizing:border-box;">
+                    </div>
                 </div>
 
-                <div>
-                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.tipo.label }}</label>
-                    {{ form.tipo }}
-                    <p style="font-size:12px; color:#64748b; margin-top:4px;">El monto total se calculará automáticamente según el tipo seleccionado.</p>
-                    {% if form.tipo.errors %}
-                    <span style="color:#fca5a5; font-size:12px;">{{ form.tipo.errors.0 }}</span>
-                    {% endif %}
+                <div id="filtro_proveedor" style="display:none; margin-bottom:14px;">
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">Filtrar por proveedor</label>
+                    <select name="proveedor_id" style="width:100%; padding:10px 14px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; box-sizing:border-box;">
+                        <option value="">— Todos los proveedores —</option>
+                        {% for prov in proveedores %}
+                        <option value="{{ prov.id }}" {% if reporte and reporte.filtros.proveedor_id == prov.id|stringformat:"s" %}selected{% endif %}>{{ prov.nombre }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
+                <div id="filtro_cliente" style="display:none; margin-bottom:14px;">
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">Filtrar por cliente</label>
+                    <select name="cliente_id" style="width:100%; padding:10px 14px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; box-sizing:border-box;">
+                        <option value="">— Todos los clientes —</option>
+                        {% for cli in clientes %}
+                        <option value="{{ cli.id }}" {% if reporte and reporte.filtros.cliente_id == cli.id|stringformat:"s" %}selected{% endif %}>{{ cli.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div id="filtro_umbral" style="display:none;">
+                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">Umbral de stock crítico</label>
+                    <p style="color:#64748b; font-size:12px; margin-bottom:6px;">Se mostrarán productos con stock igual o menor a este número.</p>
+                    <input type="number" name="umbral" min="1" value="{% if reporte %}{{ reporte.filtros.umbral|default:10 }}{% else %}10{% endif %}"
+                        style="width:180px; padding:10px 14px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; box-sizing:border-box;">
+                </div>
+            </div>
+
+            <div style="background:#1e293b; border-radius:10px; padding:20px;">
+                <div style="color:#D3DCED; font-size:14px; font-weight:bold; margin-bottom:4px;">Agrupación de resultados</div>
+                <div style="color:#64748b; font-size:12px; margin-bottom:14px;">Agrupa y suma los datos por un campo común. Por ejemplo, agrupa las ventas por cliente para ver el total que compró cada uno.</div>
+                <div id="cols_agrupacion" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+            </div>
+
+            <div style="background:#1e293b; border-radius:10px; padding:20px;">
+                <div style="color:#D3DCED; font-size:14px; font-weight:bold; margin-bottom:14px;">Opciones avanzadas</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
                     <div>
-                        <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.fecha_desde.label }}</label>
-                        {{ form.fecha_desde }}
+                        <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:4px;">Límite de registros</label>
+                        <p style="color:#64748b; font-size:12px; margin-bottom:6px;">Número máximo de filas a mostrar (1 – 5000).</p>
+                        <input type="number" name="limite" min="1" max="5000" value="{% if reporte %}{{ reporte.limite }}{% else %}100{% endif %}"
+                            style="width:100%; padding:10px 14px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; box-sizing:border-box;">
                     </div>
                     <div>
-                        <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.fecha_hasta.label }}</label>
-                        {{ form.fecha_hasta }}
+                        <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:4px;">Campo de ordenamiento</label>
+                        <p style="color:#64748b; font-size:12px; margin-bottom:6px;">Nombre del campo. Prefija con <code style="background:#0f172a; padding:1px 5px; border-radius:3px;">-</code> para orden descendente.</p>
+                        <input type="text" name="orden" value="{% if reporte %}{{ reporte.orden }}{% endif %}" placeholder="Ej: -fecha_venta"
+                            style="width:100%; padding:10px 14px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; box-sizing:border-box;">
                     </div>
                 </div>
-
-                <div>
-                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.descripcion.label }}</label>
-                    {{ form.descripcion }}
-                    {% if form.descripcion.errors %}
-                    <span style="color:#fca5a5; font-size:12px;">{{ form.descripcion.errors.0 }}</span>
-                    {% endif %}
-                </div>
-
-                <div>
-                    <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">{{ form.usuario_creacion.label }}</label>
-                    {{ form.usuario_creacion }}
-                    {% if form.usuario_creacion.errors %}
-                    <span style="color:#fca5a5; font-size:12px;">{{ form.usuario_creacion.errors.0 }}</span>
-                    {% endif %}
-                </div>
-
-                <div style="display:flex; align-items:center; gap:10px;">
-                    {{ form.activo_tf }}
-                    <label style="color:#94a3b8; font-size:13px;">{{ form.activo_tf.label }}</label>
-                </div>
-
-                <div style="display:flex; gap:12px; margin-top:8px;">
-                    <button type="submit" style="background:#38bdf8; color:#0f172a; border:none; padding:12px 28px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">
-                        {{ accion }} Reporte
-                    </button>
-                    <a href="{% url 'reportes:listar' %}">
-                        <button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer; font-size:15px;">
-                            Cancelar
-                        </button>
-                    </a>
-                </div>
-
             </div>
-        </form>
-    </div>
 
+            <div>
+                <label style="display:block; color:#94a3b8; font-size:13px; margin-bottom:6px;">Descripción (opcional)</label>
+                <textarea name="descripcion" rows="3" placeholder="Describe el propósito de este reporte..."
+                    style="width:100%; padding:10px 14px; background:#1e293b; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; box-sizing:border-box; resize:vertical;">{% if reporte %}{{ reporte.descripcion }}{% endif %}</textarea>
+            </div>
+
+            {% if reporte %}
+            <div style="display:flex; align-items:center; gap:10px;">
+                <input type="checkbox" name="activo_tf" id="id_activo_tf" {% if reporte.activo_tf %}checked{% endif %} style="accent-color:#38bdf8; width:16px; height:16px;">
+                <label for="id_activo_tf" style="color:#94a3b8; font-size:13px;">Reporte activo (visible en el listado)</label>
+            </div>
+            {% endif %}
+
+            <div style="display:flex; gap:12px; padding-bottom:30px;">
+                <button type="submit" style="background:#38bdf8; color:#0f172a; border:none; padding:13px 32px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">{{ accion }} reporte</button>
+                <a href="{% url 'reportes:listar' %}">
+                    <button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:13px 22px; border-radius:6px; cursor:pointer; font-size:15px;">Cancelar</button>
+                </a>
+            </div>
+
+        </div>
+    </form>
 </div>
 
-<style>
-    .form-input {
-        width: 100%;
-        padding: 10px 14px;
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 6px;
-        color: #D3DCED;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-    .form-input:focus {
-        outline: none;
-        border-color: #38bdf8;
-    }
-    .form-select {
-        width: 100%;
-        padding: 10px 14px;
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 6px;
-        color: #D3DCED;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-    .form-select:focus {
-        outline: none;
-        border-color: #38bdf8;
-    }
-    .form-checkbox {
-        width: 18px;
-        height: 18px;
-        accent-color: #38bdf8;
-    }
-</style>
+<input type="hidden" id="cols_actuales" value="{% if reporte %}{{ reporte.columnas_seleccionadas|join:',' }}{% endif %}">
+<input type="hidden" id="agrup_actual" value="{% if reporte %}{{ reporte.agrupacion }}{% endif %}">
+
+<script>
+var columnasPorTipo = {{ columnas_por_tipo_json|safe }};
+var agrupacionesPorTipo = {{ agrupaciones_por_tipo_json|safe }};
+
+function actualizarFormulario() {
+    var tipo = document.getElementById('id_tipo').value;
+    var cols = columnasPorTipo[tipo] || [];
+    var ags = agrupacionesPorTipo[tipo] || [['', 'Sin agrupar']];
+    var colsActuales = document.getElementById('cols_actuales').value;
+    var colsArr = colsActuales ? colsActuales.split(',') : [];
+    var agrupActual = document.getElementById('agrup_actual').value;
+
+    var contenedorCols = document.getElementById('cols_dinamicas');
+    contenedorCols.innerHTML = '';
+    cols.forEach(function(par) {
+        var campo = par[0];
+        var etiqueta = par[1];
+        var marcado = colsArr.indexOf(campo) >= 0;
+        var id = 'col_' + campo.replace(/[^a-z0-9]/gi, '_');
+        var bloque = document.createElement('label');
+        bloque.setAttribute('for', id);
+        bloque.style.cssText = 'display:flex; align-items:center; gap:8px; background:#0f172a; border:1px solid ' + (marcado ? '#38bdf8' : '#334155') + '; padding:9px 14px; border-radius:7px; cursor:pointer; font-size:13px; color:#D3DCED; transition:border-color 0.15s;';
+        bloque.innerHTML = '<input type="checkbox" id="' + id + '" name="columnas" value="' + campo + '" ' + (marcado ? 'checked' : '') + ' style="accent-color:#38bdf8; width:15px; height:15px; flex-shrink:0;">'
+            + '<span>' + etiqueta + '</span>';
+        bloque.querySelector('input').addEventListener('change', function() {
+            bloque.style.borderColor = this.checked ? '#38bdf8' : '#334155';
+        });
+        contenedorCols.appendChild(bloque);
+    });
+
+    var contenedorAg = document.getElementById('cols_agrupacion');
+    contenedorAg.innerHTML = '';
+    ags.forEach(function(par) {
+        var valor = par[0];
+        var etiqueta = par[1];
+        var marcado = valor === agrupActual || (!agrupActual && valor === '');
+        var id = 'ag_' + (valor || 'ninguna');
+        var bloque = document.createElement('label');
+        bloque.setAttribute('for', id);
+        var esSinAgrupar = valor === '';
+        bloque.style.cssText = 'display:flex; align-items:center; gap:8px; background:#0f172a; border:1px solid ' + (marcado ? '#38bdf8' : '#334155') + '; padding:9px 14px; border-radius:7px; cursor:pointer; font-size:13px; color:' + (esSinAgrupar ? '#94a3b8' : '#D3DCED') + ';';
+        bloque.innerHTML = '<input type="radio" id="' + id + '" name="agrupacion" value="' + valor + '" ' + (marcado ? 'checked' : '') + ' style="accent-color:#38bdf8; width:15px; height:15px; flex-shrink:0;">'
+            + '<span>' + etiqueta + '</span>';
+        bloque.querySelector('input').addEventListener('change', function() {
+            contenedorAg.querySelectorAll('label').forEach(function(l) { l.style.borderColor = '#334155'; });
+            bloque.style.borderColor = '#38bdf8';
+        });
+        contenedorAg.appendChild(bloque);
+    });
+
+    document.getElementById('filtro_proveedor').style.display = (['productos','rentabilidad','stock_critico'].indexOf(tipo) >= 0) ? 'block' : 'none';
+    document.getElementById('filtro_cliente').style.display = (tipo === 'ventas') ? 'block' : 'none';
+    document.getElementById('filtro_umbral').style.display = (tipo === 'stock_critico') ? 'block' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', actualizarFormulario);
+</script>
 {% endblock %}

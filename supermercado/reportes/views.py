@@ -1,19 +1,13 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Sum, Count, Avg, Q
+from django.db.models import Q
 from django.contrib import messages
 from . import models
-from .forms import ReporteForm
-from ventas.models import Venta, DetalleVenta
-from productos.models import Producto
+from .models import TIPOS_REPORTE, COLUMNAS_POR_TIPO, AGRUPACIONES_POR_TIPO
+from .motor_consultas import ejecutar
+from .exportadores import exportar_pdf, exportar_excel
 from terceros.models import Proveedor, Cliente
-from decimal import Decimal
 
-
-TIPOS_REPORTE = {
-    'ventas': 'Reporte de Ventas',
-    'productos': 'Reporte de Productos',
-    'proveedores': 'Reporte de Proveedores',
-}
 
 def listar(request):
     buscar = request.GET.get('buscar', '')
@@ -33,7 +27,7 @@ def listar(request):
     elif estado_filtro == 'inactivo':
         reportes = reportes.filter(activo_tf=False)
 
-    data = {
+    datos = {
         'reportes': reportes,
         'existe': reportes.exists(),
         'tipos': TIPOS_REPORTE,
@@ -42,70 +36,136 @@ def listar(request):
         'estado_filtro': estado_filtro,
         'total_reportes': reportes.count(),
     }
-    return render(request, 'list.html', data)
+    return render(request, 'list.html', datos)
 
 
 def crear(request):
     if request.method == 'POST':
-        form = ReporteForm(request.POST)
-        if form.is_valid():
-            reporte = form.save(commit=False)
-            tipo = reporte.tipo
-            fecha_desde = request.POST.get('fecha_desde')
-            fecha_hasta = request.POST.get('fecha_hasta')
-            parametros = {'fecha_desde': fecha_desde, 'fecha_hasta': fecha_hasta}
-            reporte.parametros = parametros
+        nombre = request.POST.get('nombre', '').strip()
+        tipo = request.POST.get('tipo', 'ventas')
+        descripcion = request.POST.get('descripcion', '').strip()
+        usuario = request.POST.get('usuario_creacion', 'admin').strip()
 
-            total = Decimal('0')
-            if tipo == 'ventas':
-                qs = Venta.objects.all()
-                if fecha_desde:
-                    qs = qs.filter(fecha_venta__gte=fecha_desde)
-                if fecha_hasta:
-                    qs = qs.filter(fecha_venta__lte=fecha_hasta)
-                total = qs.aggregate(t=Sum('total_venta'))['t'] or Decimal('0')
+        if not nombre:
+            messages.error(request, 'El nombre del reporte es obligatorio.')
+            return redirect('reportes:crear')
 
-            elif tipo == 'productos':
-                total = Producto.objects.aggregate(
-                    t=Sum('precio')
-                )['t'] or Decimal('0')
+        columnas = request.POST.getlist('columnas')
+        if not columnas:
+            columnas = [c[0] for c in COLUMNAS_POR_TIPO.get(tipo, [])[:4]]
 
-            elif tipo == 'proveedores':
-                total = Decimal(Proveedor.objects.filter(activo=True).count())
+        filtros = {}
+        fecha_desde = request.POST.get('fecha_desde', '').strip()
+        fecha_hasta = request.POST.get('fecha_hasta', '').strip()
+        if fecha_desde:
+            filtros['fecha_desde'] = fecha_desde
+        if fecha_hasta:
+            filtros['fecha_hasta'] = fecha_hasta
 
-            reporte.total_monto = total
-            reporte.save()
-            messages.success(request, f'Reporte "{reporte.nombre}" creado exitosamente.')
-            return redirect('reportes:listar')
-    else:
-        form = ReporteForm()
+        if tipo == 'stock_critico':
+            umbral = request.POST.get('umbral', '10').strip()
+            filtros['umbral'] = int(umbral) if umbral.isdigit() else 10
 
-    data = {
-        'form': form,
+        if tipo in ('productos', 'rentabilidad', 'stock_critico'):
+            proveedor_id = request.POST.get('proveedor_id', '').strip()
+            if proveedor_id:
+                filtros['proveedor_id'] = proveedor_id
+
+        if tipo == 'ventas':
+            cliente_id = request.POST.get('cliente_id', '').strip()
+            if cliente_id:
+                filtros['cliente_id'] = cliente_id
+
+        if tipo in ('clientes', 'proveedores'):
+            if request.POST.get('solo_activos'):
+                filtros['solo_activos'] = True
+
+        reporte = models.Reporte.objects.create(
+            nombre=nombre,
+            tipo=tipo,
+            descripcion=descripcion or None,
+            usuario_creacion=usuario,
+            columnas_seleccionadas=columnas,
+            filtros=filtros,
+            agrupacion=request.POST.get('agrupacion', '').strip() or None,
+            orden=request.POST.get('orden', '').strip() or None,
+            limite=int(request.POST.get('limite', 100)) if request.POST.get('limite', '').isdigit() else 100,
+        )
+        messages.success(request, f'Reporte "{reporte.nombre}" creado exitosamente.')
+        return redirect('reportes:visualizar', id_reporte=reporte.id_reporte)
+
+    tipo_inicial = request.GET.get('tipo', 'ventas')
+    datos = {
         'tipos': TIPOS_REPORTE,
+        'columnas_por_tipo_json': json.dumps({t: [list(par) for par in cols] for t, cols in COLUMNAS_POR_TIPO.items()}, ensure_ascii=False),
+        'agrupaciones_por_tipo_json': json.dumps({t: [list(par) for par in ag] for t, ag in AGRUPACIONES_POR_TIPO.items()}, ensure_ascii=False),
+        'tipo_inicial': tipo_inicial,
+        'proveedores': Proveedor.objects.filter(activo=True).order_by('nombre'),
+        'clientes': Cliente.objects.filter(activo=True).order_by('nombre'),
         'accion': 'Crear',
     }
-    return render(request, 'crear_reporte.html', data)
+    return render(request, 'crear_reporte.html', datos)
 
 
 def editar(request, id_reporte):
     reporte = get_object_or_404(models.Reporte, id_reporte=id_reporte)
-    if request.method == 'POST':
-        form = ReporteForm(request.POST, instance=reporte)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f'Reporte "{reporte.nombre}" actualizado.')
-            return redirect('reportes:listar')
-    else:
-        form = ReporteForm(instance=reporte)
 
-    data = {
-        'form': form,
+    if request.method == 'POST':
+        reporte.nombre = request.POST.get('nombre', reporte.nombre).strip()
+        reporte.descripcion = request.POST.get('descripcion', '').strip() or None
+        reporte.usuario_creacion = request.POST.get('usuario_creacion', reporte.usuario_creacion).strip()
+        reporte.activo_tf = 'activo_tf' in request.POST
+
+        columnas = request.POST.getlist('columnas')
+        if columnas:
+            reporte.columnas_seleccionadas = columnas
+
+        filtros = {}
+        fecha_desde = request.POST.get('fecha_desde', '').strip()
+        fecha_hasta = request.POST.get('fecha_hasta', '').strip()
+        if fecha_desde:
+            filtros['fecha_desde'] = fecha_desde
+        if fecha_hasta:
+            filtros['fecha_hasta'] = fecha_hasta
+
+        if reporte.tipo == 'stock_critico':
+            umbral = request.POST.get('umbral', '10').strip()
+            filtros['umbral'] = int(umbral) if umbral.isdigit() else 10
+
+        if reporte.tipo in ('productos', 'rentabilidad', 'stock_critico'):
+            proveedor_id = request.POST.get('proveedor_id', '').strip()
+            if proveedor_id:
+                filtros['proveedor_id'] = proveedor_id
+
+        if reporte.tipo == 'ventas':
+            cliente_id = request.POST.get('cliente_id', '').strip()
+            if cliente_id:
+                filtros['cliente_id'] = cliente_id
+
+        if reporte.tipo in ('clientes', 'proveedores'):
+            if request.POST.get('solo_activos'):
+                filtros['solo_activos'] = True
+
+        reporte.filtros = filtros
+        reporte.agrupacion = request.POST.get('agrupacion', '').strip() or None
+        reporte.orden = request.POST.get('orden', '').strip() or None
+        limite_raw = request.POST.get('limite', '100').strip()
+        reporte.limite = int(limite_raw) if limite_raw.isdigit() else 100
+        reporte.save()
+
+        messages.success(request, f'Reporte "{reporte.nombre}" actualizado.')
+        return redirect('reportes:visualizar', id_reporte=reporte.id_reporte)
+
+    datos = {
         'reporte': reporte,
         'tipos': TIPOS_REPORTE,
+        'columnas_por_tipo_json': json.dumps({t: [list(par) for par in cols] for t, cols in COLUMNAS_POR_TIPO.items()}, ensure_ascii=False),
+        'agrupaciones_por_tipo_json': json.dumps({t: [list(par) for par in ag] for t, ag in AGRUPACIONES_POR_TIPO.items()}, ensure_ascii=False),
+        'proveedores': Proveedor.objects.filter(activo=True).order_by('nombre'),
+        'clientes': Cliente.objects.filter(activo=True).order_by('nombre'),
         'accion': 'Editar',
     }
-    return render(request, 'crear_reporte.html', data)
+    return render(request, 'crear_reporte.html', datos)
 
 
 def eliminar(request, id_reporte):
@@ -118,27 +178,31 @@ def eliminar(request, id_reporte):
     return render(request, 'confirmar_eliminar.html', {'reporte': reporte})
 
 
-def config(request, id_reporte):
+def visualizar(request, id_reporte):
     reporte = get_object_or_404(models.Reporte, id_reporte=id_reporte)
-
-    if request.method == 'POST':
-        ids_seleccionados = request.POST.getlist('categorias')
-        reporte.categorias.set(
-            models.CategoriaReporte.objects.filter(id__in=ids_seleccionados)
-        )
-        messages.success(request, 'Categorías actualizadas correctamente.')
-        return redirect('reportes:config', id_reporte=id_reporte)
-
-    todas_categorias = models.CategoriaReporte.objects.all().order_by('nombre')
-    ids_asignados = reporte.categorias.values_list('id', flat=True)
-
-    data = {
+    resultado = ejecutar(reporte)
+    datos = {
         'reporte': reporte,
-        'todas_categorias': todas_categorias,
-        'ids_asignados': ids_asignados,
-        'tipos': TIPOS_REPORTE,
+        'resultado': resultado,
+        'filas': resultado['filas'],
+        'etiquetas': resultado['etiquetas'],
+        'totales': resultado['totales'],
+        'graficas': resultado.get('graficas', {}),
+        'graficas_json': json.dumps(resultado.get('graficas', {}), ensure_ascii=False),
+        'tipos': dict(TIPOS_REPORTE),
     }
-    return render(request, 'config.html', data)
+    return render(request, 'visualizar_reporte.html', datos)
+
+
+def exportar(request, id_reporte, formato):
+    reporte = get_object_or_404(models.Reporte, id_reporte=id_reporte)
+    resultado = ejecutar(reporte)
+    if formato == 'pdf':
+        return exportar_pdf(reporte, resultado)
+    if formato == 'excel':
+        return exportar_excel(reporte, resultado)
+    messages.error(request, 'Formato de exportación no válido.')
+    return redirect('reportes:visualizar', id_reporte=id_reporte)
 
 
 def categorias(request):
@@ -152,16 +216,16 @@ def categorias(request):
                 messages.error(request, f'Ya existe una categoría con el nombre "{nombre}".')
             else:
                 models.CategoriaReporte.objects.create(nombre=nombre, descripcion=descripcion or None)
-                messages.success(request, f'Categoría "{nombre}" creada exitosamente.')
+                messages.success(request, f'Categoría "{nombre}" creada.')
                 return redirect('reportes:categorias')
         else:
-            messages.error(request, 'El nombre de la categoría es obligatorio.')
+            messages.error(request, 'El nombre es obligatorio.')
 
-    data = {
+    datos = {
         'todas': todas,
-        'tipos': TIPOS_REPORTE,
+        'tipos': dict(TIPOS_REPORTE),
     }
-    return render(request, 'categorias.html', data)
+    return render(request, 'categorias.html', datos)
 
 
 def eliminar_categoria(request, categoria_id):
@@ -171,80 +235,28 @@ def eliminar_categoria(request, categoria_id):
         categoria.delete()
         messages.success(request, f'Categoría "{nombre}" eliminada.')
         return redirect('reportes:categorias')
-    data = {
+    datos = {
         'categoria': categoria,
-        'tipos': TIPOS_REPORTE,
+        'tipos': dict(TIPOS_REPORTE),
     }
-    return render(request, 'confirmar_eliminar_categoria.html', data)
+    return render(request, 'confirmar_eliminar_categoria.html', datos)
 
 
-def reportes(request, tipo):
-    if tipo not in TIPOS_REPORTE:
-        messages.error(request, 'Tipo de reporte no válido.')
-        return redirect('reportes:listar')
+def asignar_categorias(request, id_reporte):
+    reporte = get_object_or_404(models.Reporte, id_reporte=id_reporte)
+    if request.method == 'POST':
+        ids_seleccionados = request.POST.getlist('categorias')
+        reporte.categorias.set(
+            models.CategoriaReporte.objects.filter(id__in=ids_seleccionados)
+        )
+        messages.success(request, 'Categorías actualizadas.')
+        return redirect('reportes:visualizar', id_reporte=id_reporte)
 
-    fecha_desde = request.GET.get('fecha_desde', '')
-    fecha_hasta = request.GET.get('fecha_hasta', '')
-    contexto = {
-        'tipo': tipo,
-        'titulo': TIPOS_REPORTE[tipo],
-        'fecha_desde': fecha_desde,
-        'fecha_hasta': fecha_hasta,
-        'tipos': TIPOS_REPORTE,
+    todas_categorias = models.CategoriaReporte.objects.all().order_by('nombre')
+    ids_asignados = list(reporte.categorias.values_list('id', flat=True))
+    datos = {
+        'reporte': reporte,
+        'todas_categorias': todas_categorias,
+        'ids_asignados': ids_asignados,
     }
-
-    if tipo == 'ventas':
-        qs = Venta.objects.all().order_by('-fecha_venta')
-        if fecha_desde:
-            qs = qs.filter(fecha_venta__gte=fecha_desde)
-        if fecha_hasta:
-            qs = qs.filter(fecha_venta__lte=fecha_hasta)
-
-        total_ventas = qs.aggregate(t=Sum('total_venta'))['t'] or 0
-        promedio = qs.aggregate(a=Avg('total_venta'))['a'] or 0
-        por_fecha = (
-            qs.values('fecha_venta')
-            .annotate(total=Sum('total_venta'), cantidad=Count('id'))
-            .order_by('-fecha_venta')[:10]
-        )
-        contexto.update({
-            'ventas': qs[:50],
-            'total_ventas': total_ventas,
-            'promedio_venta': promedio,
-            'total_registros': qs.count(),
-            'ventas_por_fecha': por_fecha,
-        })
-
-    elif tipo == 'productos':
-        qs = Producto.objects.all().order_by('nombre_producto')
-        sin_stock = qs.filter(stock=0).count()
-        stock_bajo = qs.filter(stock__gt=0, stock__lt=10).count()
-        valor_total = qs.aggregate(
-            t=Sum('precio')
-        )['t'] or 0
-        contexto.update({
-            'productos': qs[:50],
-            'total_productos': qs.count(),
-            'sin_stock': sin_stock,
-            'stock_bajo': stock_bajo,
-            'valor_inventario': valor_total,
-        })
-
-    elif tipo == 'proveedores':
-        qs = Proveedor.objects.all().order_by('nombre')
-        activos = qs.filter(activo=True).count()
-        inactivos = qs.filter(activo=False).count()
-        por_ciudad = (
-            qs.values('ciudad')
-            .annotate(cantidad=Count('id'))
-            .order_by('-cantidad')[:5]
-        )
-        contexto.update({
-            'proveedores': qs[:50],
-            'activos': activos,
-            'inactivos': inactivos,
-            'total_proveedores': qs.count(),
-            'por_ciudad': por_ciudad,
-        })
-
-    return render(request, 'reportes.html', contexto)
+    return render(request, 'asignar_categorias.html', datos)

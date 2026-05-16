@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+ 
+{% block contenido %}
+<div class="contenedorP">
+    <a href="{% url 'reportes:visualizar' reporte.id_reporte %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver al reporte</a>
+    <h1>Asignar categorías — {{ reporte.nombre }}</h1>
+    {% if messages %}{% for m in messages %}<div style="background:{% if m.tags == 'success' %}#064e3b{% else %}#7f1d1d{% endif %}; color:#D3DCED; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">{{ m }}</div>{% endfor %}{% endif %}
+    {% if todas_categorias %}
+    <form method="post" style="max-width:500px;">
+        {% csrf_token %}
+        <div style="background:#1e293b; padding:20px; border-radius:8px; margin-top:12px;">
+            <div style="color:#94a3b8; font-size:13px; font-weight:bold; text-transform:uppercase; margin-bottom:14px;">Selecciona categorías</div>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+                {% for cat in todas_categorias %}
+                <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; padding:10px 12px; border-radius:6px; background:#0f172a; {% if cat.id in ids_asignados %}border-left:3px solid #38bdf8;{% else %}border-left:3px solid transparent;{% endif %}">
+                    <input type="checkbox" name="categorias" value="{{ cat.id }}" {% if cat.id in ids_asignados %}checked{% endif %} style="accent-color:#38bdf8; margin-top:2px; width:16px; height:16px; flex-shrink:0;">
+                    <div>
+                        <div style="color:#D3DCED; font-size:14px; font-weight:500;">{{ cat.nombre }}</div>
+                        {% if cat.descripcion %}<div style="color:#64748b; font-size:12px; margin-top:2px;">{{ cat.descripcion }}</div>{% endif %}
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+            <button type="submit" style="background:#38bdf8; color:#0f172a; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">Guardar categorías</button>
+        </div>
+    </form>
+    {% else %}
+    <p style="color:#94a3b8; margin-top:16px;">No hay categorías disponibles. <a href="{% url 'reportes:categorias' %}" style="color:#38bdf8;">Crear categorías</a></p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block menu_ventas %}menu-activo{% endblock %}
+{% block contenido %}
+<div class="contenedorP">
+    <a href="{% url 'ventas:detalle_venta' venta.id %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver</a>
+    <h1>Anular venta</h1>
+    <div style="max-width:500px; margin:30px auto; background:#1e293b; border-radius:10px; padding:32px; text-align:center; border:1px solid #7f1d1d;">
+        <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+        <h2 style="color:#fca5a5; margin-bottom:12px;">¿Anular venta #{{ venta.id }}?</h2>
+        <p style="color:#94a3b8; font-size:14px; margin-bottom:20px;">El stock de los productos se restaurará. Esta acción no se puede deshacer.</p>
+        <div style="background:#0f172a; border-radius:6px; padding:12px; margin-bottom:20px; font-size:13px; text-align:left;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="color:#64748b;">Cliente:</span><span style="color:#D3DCED;">{{ venta.cliente.nombre }}</span></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:#64748b;">Total:</span><span style="color:#38bdf8;">${{ venta.total_venta|floatformat:2 }}</span></div>
+        </div>
+        <form method="post" style="display:flex; gap:12px; justify-content:center;">
+            {% csrf_token %}
+            <button type="submit" style="background:#991b1b; color:white; border:none; padding:12px 24px; border-radius:6px; font-weight:bold; cursor:pointer;">Sí, anular</button>
+            <a href="{% url 'ventas:detalle_venta' venta.id %}"><button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer;">Cancelar</button></a>
+        </form>
+    </div>
+</div>
+{% endblock %}

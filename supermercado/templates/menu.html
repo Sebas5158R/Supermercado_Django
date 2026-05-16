@@ -1,19 +1,32 @@
 {% load static %}
 <div class="barra">
     <h2>Supermercado Lolitas</h2>
-     <a href="{% url 'productos:gestion_productos' %}">
-    <div class="item-menu">Gestión de Productos</div>
+    <a href="{% url 'productos:gestion_productos' %}" style="text-decoration:none;">
+        <div class="item-menu {% block menu_productos %}{% endblock %}">Productos</div>
     </a>
-    <a href="{% url 'ventas:lista_ventas' %}">
-        <div class="item-menu">Gestión de Clientes/Ventas</div>
+    <a href="{% url 'ventas:lista_ventas' %}" style="text-decoration:none;">
+        <div class="item-menu {% block menu_ventas %}{% endblock %}">Ventas</div>
     </a>
-    <a href="{% url 'terceros:lista_terceros' %}">
-        <div class="item-menu">Gestión de Terceros</div>
+    <a href="{% url 'compras:lista_compras' %}" style="text-decoration:none;">
+        <div class="item-menu {% block menu_compras %}{% endblock %}">Compras</div>
     </a>
-    <a href="{% url 'compras:lista_compras' %}">
-        <div class="item-menu">Gestión de Compras</div>
+    <a href="{% url 'terceros:lista_terceros' %}" style="text-decoration:none;">
+        <div class="item-menu {% block menu_terceros %}{% endblock %}">Terceros</div>
     </a>
     <a href="{% url 'reportes:listar' %}" style="text-decoration:none;">
-        <div class="item-menu {% block menu_reportes %}{% endblock %}">Gestión de Reportes</div>
+        <div class="item-menu {% block menu_reportes %}{% endblock %}">Reportes</div>
+    </a>
+    <div style="border-top:1px solid #1e293b; margin:12px 0;"></div>
+    <a href="{% url 'productos:alertas_stock' %}" style="text-decoration:none;">
+        <div class="item-menu" style="font-size:12px; color:#f59e0b;">⚠ Stock crítico</div>
+    </a>
+    <a href="{% url 'productos:top_productos' %}" style="text-decoration:none;">
+        <div class="item-menu" style="font-size:12px; color:#34d399;">↑ Top ventas</div>
+    </a>
+    <a href="{% url 'productos:alertas_vencimiento' %}" style="text-decoration:none;">
+        <div class="item-menu" style="font-size:12px; color:#f87171;">📅 Por vencer</div>
+    </a>
+    <a href="{% url 'productos:resumen_diario' %}" style="text-decoration:none;">
+        <div class="item-menu" style="font-size:12px; color:#a78bfa;">📊 Resumen diario</div>
     </a>
 </div>

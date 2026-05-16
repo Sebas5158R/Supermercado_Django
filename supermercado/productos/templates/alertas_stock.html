@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block menu_productos %}menu-activo{% endblock %}
+{% block contenido %}
+<div class="contenedorP">
+    <a href="{% url 'productos:gestion_productos' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver</a>
+    <h1>Alertas de stock crítico</h1>
+    {% if messages %}{% for m in messages %}<div style="background:{% if m.tags == 'success' %}#064e3b{% else %}#7f1d1d{% endif %}; color:#D3DCED; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px;">{{ m }}</div>{% endfor %}{% endif %}
+    <div style="background:#1e293b; padding:14px 18px; border-radius:8px; margin-bottom:16px; border-left:3px solid #f59e0b;">
+        <span style="color:#94a3b8; font-size:13px;">Umbral configurado: stock ≤ </span>
+        <span style="color:#f59e0b; font-weight:bold;">{{ umbral }} unidades</span>
+        <span style="color:#94a3b8; font-size:13px;"> — </span>
+        <span style="color:#D3DCED; font-weight:bold;">{{ criticos|length }} producto(s) afectado(s)</span>
+    </div>
+    {% if criticos %}
+    <div style="background:#1e293b; padding:20px; border-radius:8px; margin-bottom:20px;">
+        <div style="color:#94a3b8; font-size:13px; font-weight:bold; text-transform:uppercase; margin-bottom:14px;">Enviar alerta por correo</div>
+        <form method="post" style="display:flex; gap:10px; flex-wrap:wrap;">
+            {% csrf_token %}
+            <input type="email" name="email_destino" placeholder="destinatario@correo.com" required style="padding:10px 14px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#D3DCED; font-size:14px; flex:1; min-width:250px;">
+            <button type="submit" style="background:#f59e0b; color:#0f172a; border:none; padding:10px 18px; border-radius:6px; font-weight:bold; cursor:pointer;">Enviar alerta</button>
+        </form>
+    </div>
+    <table><thead><tr>
+        <th style="padding:12px;">Producto</th><th style="padding:12px;">Stock actual</th>
+        <th style="padding:12px;">Proveedor</th><th style="padding:12px;">Precio</th>
+        <th style="padding:12px;">Vencimiento</th><th style="padding:12px;">Acciones</th>
+    </tr></thead><tbody>
+    {% for p in criticos %}
+    <tr>
+        <td style="padding:10px 12px; font-weight:500;">{{ p.nombre_producto }}</td>
+        <td style="padding:10px 12px; text-align:center;"><span style="{% if p.stock == 0 %}color:#ef4444;{% else %}color:#f59e0b;{% endif %} font-weight:bold; font-size:16px;">{{ p.stock }}</span></td>
+        <td style="padding:10px 12px;">{{ p.proveedor.nombre }}</td>
+        <td style="padding:10px 12px;">${{ p.precio|floatformat:2 }}</td>
+        <td style="padding:10px 12px;">{{ p.fecha_vencimiento|date:"d/m/Y" }}</td>
+        <td class="acciones" style="padding:10px 12px;">
+            <a href="{% url 'productos:editar_producto' p.uuid_public %}"><button>Editar</button></a>
+            <a href="{% url 'compras:crear_compra' %}"><button style="background:#0369a1;">Comprar</button></a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody></table>
+    {% else %}
+    <div style="text-align:center; padding:40px; color:#94a3b8;"><p>No hay productos con stock crítico. ✓</p></div>
+    {% endif %}
+</div>
+{% endblock %}

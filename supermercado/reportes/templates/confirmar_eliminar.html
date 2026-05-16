@@ -1,56 +1,18 @@
 {% extends "layout.html" %}
-
-{% block menu_reportes %}menu-activo{% endblock %}
-
+ 
 {% block contenido %}
 <div class="contenedorP">
-
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
-        <a href="{% url 'reportes:listar' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver al listado</a>
-    </div>
-
-    <h1>Eliminar Reporte</h1>
-
-    <div style="max-width:520px; margin:30px auto; background:#1e293b; border-radius:10px; padding:32px; text-align:center; border:1px solid #7f1d1d;">
-
+    <a href="{% url 'reportes:listar' %}" style="color:#94a3b8; text-decoration:none; font-size:13px;">← Volver</a>
+    <h1>Eliminar reporte</h1>
+    <div style="max-width:500px; margin:30px auto; background:#1e293b; border-radius:10px; padding:32px; text-align:center; border:1px solid #7f1d1d;">
         <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
-
-        <h2 style="color:#fca5a5; margin-bottom:12px; font-size:20px;">¿Confirmar eliminación?</h2>
-
-        <p style="color:#94a3b8; font-size:14px; line-height:1.6; margin-bottom:20px;">
-            Estás a punto de eliminar el reporte
-            <strong style="color:#D3DCED;">"{{ reporte.nombre }}"</strong>.
-            Esta acción no se puede deshacer.
-        </p>
-
-        <div style="background:#0f172a; border-radius:6px; padding:14px; margin-bottom:24px; text-align:left;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;">
-                <span style="color:#64748b;">Tipo:</span>
-                <span style="color:#D3DCED;">{{ reporte.tipo }}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;">
-                <span style="color:#64748b;">Monto:</span>
-                <span style="color:#38bdf8;">${{ reporte.total_monto|floatformat:2 }}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:13px;">
-                <span style="color:#64748b;">Creado:</span>
-                <span style="color:#D3DCED;">{{ reporte.fecha_creacion|date:"d/m/Y" }}</span>
-            </div>
-        </div>
-
+        <h2 style="color:#fca5a5; margin-bottom:12px; font-size:20px;">¿Eliminar este reporte?</h2>
+        <p style="color:#94a3b8; font-size:14px; margin-bottom:20px;">Se eliminará el reporte <strong style="color:#D3DCED;">"{{ reporte.nombre }}"</strong> ({{ reporte.get_tipo_display }}) de forma permanente.</p>
         <form method="post" style="display:flex; gap:12px; justify-content:center;">
             {% csrf_token %}
-            <button type="submit" style="background:#991b1b; color:white; border:none; padding:12px 24px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:15px;">
-                Sí, eliminar
-            </button>
-            <a href="{% url 'reportes:listar' %}">
-                <button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer; font-size:15px;">
-                    Cancelar
-                </button>
-            </a>
+            <button type="submit" style="background:#991b1b; color:white; border:none; padding:12px 24px; border-radius:6px; font-weight:bold; cursor:pointer;">Sí, eliminar</button>
+            <a href="{% url 'reportes:listar' %}"><button type="button" style="background:transparent; color:#94a3b8; border:1px solid #334155; padding:12px 20px; border-radius:6px; cursor:pointer;">Cancelar</button></a>
         </form>
-
     </div>
-
 </div>
 {% endblock %}
